@@ -168,13 +168,17 @@ GGNN2025/
 │   ├── train.py                      # Main training script
 │   ├── preprocess_all.py             # Data preprocessing
 │   ├── visualize_results.py          # Generate figures
+│   ├── ablation_study.py             # Loss/architecture ablation
 │   └── download_benchmark_datasets.py
 ├── experiments/
 │   ├── comprehensive_eval.py         # Multi-benchmark evaluation
 │   ├── cross_dataset_eval.py         # Cross-dataset testing
 │   ├── pocket_level_eval.py          # Pocket success rates
-│   └── challenging_eval.py           # Cryptic/difficult sites
+│   ├── honest_eval.py                # Non-overlapping evaluation
+│   └── honest_pocket_eval.py         # Honest pocket-level metrics
 ├── analysis/
+│   ├── verify_dataset.py             # Data leakage check
+│   ├── check_benchmark_overlap.py    # Train-test overlap analysis
 │   ├── amino_acid_enrichment.py      # AA composition analysis
 │   └── case_study_validation.py      # Biological validation
 ├── checkpoints_optimized/
@@ -182,12 +186,11 @@ GGNN2025/
 ├── results_optimized/
 │   ├── figures/                      # Publication figures (9 PNG)
 │   └── *.json                        # Evaluation results
-├── tests/test_full_pipeline.py
+├── paper/
+│   ├── GGNN2025.tex                  # Paper manuscript (12 pages)
+│   └── GGNN2025.pdf                  # Compiled PDF
 ├── config_optimized.yaml             # Training configuration
 ├── requirements.txt                  # Dependencies
-├── paper/
-│   ├── GGNN2025.tex                  # Paper manuscript
-│   └── GGNN2025.pdf                  # Compiled PDF
 ├── LICENSE                           # MIT License
 └── README.md
 ```
