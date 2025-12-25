@@ -83,3 +83,6 @@ runs_*/
 !checkpoints_optimized/best_model.pth
 !requirements.txt
 !config_optimized.yaml
+
+# Paper (hidden until publication)
+paper/
