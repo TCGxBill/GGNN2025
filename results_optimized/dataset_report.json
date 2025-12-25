@@ -1,16 +1,17 @@
 {
-  "generated": "2025-12-25T10:03:00",
   "train": {
     "split": "train",
     "n_proteins": 3449,
     "total_residues": 1728213,
     "total_binding_sites": 54661,
     "total_non_binding": 1673552,
-    "binding_ratio": 0.0316,
-    "avg_protein_size": 501.08,
-    "min_protein_size": 50,
-    "max_protein_size": 2500,
-    "class_ratio": "1:31"
+    "binding_ratio": 0.03162862448089443,
+    "avg_protein_size": 501.0765439257756,
+    "min_protein_size": 51,
+    "max_protein_size": 5340,
+    "std_protein_size": 356.44761417415947,
+    "avg_binding_ratio": 0.04603789770783969,
+    "std_binding_ratio": 0.035740780674865386
   },
   "val": {
     "split": "val",
@@ -18,11 +19,13 @@
     "total_residues": 233048,
     "total_binding_sites": 6838,
     "total_non_binding": 226210,
-    "binding_ratio": 0.0293,
-    "avg_protein_size": 540.71,
-    "min_protein_size": 52,
-    "max_protein_size": 2450,
-    "class_ratio": "1:34"
+    "binding_ratio": 0.029341594864577256,
+    "avg_protein_size": 540.7146171693736,
+    "min_protein_size": 104,
+    "max_protein_size": 1996,
+    "std_protein_size": 383.37566432306977,
+    "avg_binding_ratio": 0.042596392181483006,
+    "std_binding_ratio": 0.03310512874624668
   },
   "test": {
     "split": "test",
@@ -30,37 +33,19 @@
     "total_residues": 218593,
     "total_binding_sites": 7114,
     "total_non_binding": 211479,
-    "binding_ratio": 0.0326,
-    "avg_protein_size": 505.99,
-    "min_protein_size": 48,
-    "max_protein_size": 2380,
-    "class_ratio": "1:30"
+    "binding_ratio": 0.03254450051008038,
+    "avg_protein_size": 506.00231481481484,
+    "min_protein_size": 93,
+    "max_protein_size": 1994,
+    "std_protein_size": 355.5773897300477,
+    "avg_binding_ratio": 0.04819234472821265,
+    "std_binding_ratio": 0.036715434677140876
   },
-  "total": {
-    "n_proteins": 4312,
-    "total_residues": 2179854,
-    "total_binding_sites": 68613,
-    "total_non_binding": 2111241,
-    "binding_ratio": 0.0315,
-    "class_ratio": "1:31"
+  "leakage_check": {
+    "train_val_overlap": [],
+    "train_test_overlap": [],
+    "val_test_overlap": [],
+    "has_leakage": false
   },
-  "source_datasets": {
-    "holo4k": {
-      "original_size": 4288,
-      "used": 4288,
-      "description": "Holo4K protein-ligand binding dataset"
-    },
-    "joined": {
-      "original_size": 538,
-      "used": 538,
-      "description": "Joined dataset with diverse binding sites"
-    }
-  },
-  "preprocessing": {
-    "method": "PDB to PyG graphs",
-    "node_features": 29,
-    "edge_construction": "8A distance cutoff",
-    "geometric_encoding": "32-dim, 16 distance bins"
-  },
-  "notes": "Combined dataset from Holo4K and Joined. Severe class imbalance (1:31) addressed with Combined Loss function."
+  "feature_issues": []
 }

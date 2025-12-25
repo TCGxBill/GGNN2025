@@ -1,5 +1,5 @@
 {
-  "generated": "2025-12-25T02:12:43.269064",
+  "generated": "2025-12-25T11:33:10.493647",
   "model": "checkpoints_optimized/best_model.pth",
   "results": {
     "combined/test": {
