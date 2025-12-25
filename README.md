@@ -34,7 +34,7 @@ A lightweight Geometric Graph Neural Network for predicting protein-ligand bindi
 
 ```bash
 # Clone repository
-git clone https://github.com/nhannguyenvu/GGNN2025.git
+git clone https://github.com/TCGxBill/GGNN2025.git
 cd GGNN2025
 
 # Create virtual environment
