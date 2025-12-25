@@ -1,0 +1,114 @@
+{
+  "generated": "2025-12-25T02:38:17.314173",
+  "description": "Evaluation on challenging protein-ligand binding benchmarks",
+  "benchmarks": {
+    "CryptoBench": {
+      "description": "Cryptic binding sites (VERY HARD)",
+      "n_proteins": 22,
+      "residue": {
+        "auc": 0.8549745728404644,
+        "prauc": 0.3394104113702385,
+        "f1": 0.38413361169102295,
+        "precision": 0.46464646464646464,
+        "recall": 0.3274021352313167,
+        "mcc": 0.38020569240703334,
+        "threshold": 0.8999999999999999,
+        "n_samples": 14733,
+        "n_positive": 281,
+        "positive_ratio": 0.01907282881438732
+      },
+      "pocket": {
+        "n_proteins": 22,
+        "top1": 0.5,
+        "top1_pct": "50.0%",
+        "top3": 0.5909090909090909,
+        "top3_pct": "59.1%",
+        "top5": 0.6363636363636364,
+        "top5_pct": "63.6%",
+        "top10": 0.7727272727272727,
+        "top10_pct": "77.3%"
+      }
+    },
+    "DUD-E Diverse": {
+      "description": "Drug targets (challenging)",
+      "n_proteins": 25,
+      "residue": {
+        "auc": 0.8648878796480273,
+        "prauc": 0.5083393548561418,
+        "f1": 0.5028089887640449,
+        "precision": 0.6026936026936027,
+        "recall": 0.43132530120481927,
+        "mcc": 0.493912668737464,
+        "threshold": 0.8999999999999999,
+        "n_samples": 10984,
+        "n_positive": 415,
+        "positive_ratio": 0.037782229483127594
+      },
+      "pocket": {
+        "n_proteins": 25,
+        "top1": 0.56,
+        "top1_pct": "56.0%",
+        "top3": 0.56,
+        "top3_pct": "56.0%",
+        "top5": 0.68,
+        "top5_pct": "68.0%",
+        "top10": 0.72,
+        "top10_pct": "72.0%"
+      }
+    },
+    "Difficult Cases": {
+      "description": "Large/allosteric/multi-domain",
+      "n_proteins": 19,
+      "residue": {
+        "auc": 0.6992167866984511,
+        "prauc": 0.020451099219414022,
+        "f1": 0.03759398496240601,
+        "precision": 0.02471169686985173,
+        "recall": 0.07853403141361257,
+        "mcc": 0.030047074208046202,
+        "threshold": 0.3,
+        "n_samples": 23452,
+        "n_positive": 191,
+        "positive_ratio": 0.00814429484307766
+      },
+      "pocket": {
+        "n_proteins": 19,
+        "top1": 0.10526315789473684,
+        "top1_pct": "10.5%",
+        "top3": 0.3157894736842105,
+        "top3_pct": "31.6%",
+        "top5": 0.3157894736842105,
+        "top5_pct": "31.6%",
+        "top10": 0.3684210526315789,
+        "top10_pct": "36.8%"
+      }
+    },
+    "Binding MOAD": {
+      "description": "High-quality curated",
+      "n_proteins": 13,
+      "residue": {
+        "auc": 0.980219964413729,
+        "prauc": 0.6932852112818687,
+        "f1": 0.6666666666666666,
+        "precision": 0.6208791208791209,
+        "recall": 0.7197452229299363,
+        "mcc": 0.6571790697630804,
+        "threshold": 0.6499999999999999,
+        "n_samples": 5097,
+        "n_positive": 157,
+        "positive_ratio": 0.03080243244767189
+      },
+      "pocket": {
+        "n_proteins": 13,
+        "top1": 1.0,
+        "top1_pct": "100.0%",
+        "top3": 1.0,
+        "top3_pct": "100.0%",
+        "top5": 1.0,
+        "top5_pct": "100.0%",
+        "top10": 1.0,
+        "top10_pct": "100.0%"
+      }
+    }
+  }
+}

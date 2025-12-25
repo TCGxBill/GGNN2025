@@ -1,0 +1,182 @@
+{
+  "generated": "2025-12-25T02:30:47.407746",
+  "model": {
+    "name": "GeometricGNN",
+    "parameters": 276097,
+    "checkpoint": "checkpoints_optimized/best_model.pth"
+  },
+  "benchmarks": {
+    "Combined Test": {
+      "category": "In-distribution",
+      "n_proteins": 432,
+      "residue_level": {
+        "auc": 0.9486742884018803,
+        "prauc": 0.6359685146802421,
+        "f1": 0.629395218002813,
+        "precision": 0.6297495074584858,
+        "recall": 0.6290413269609221,
+        "mcc": 0.6169356960607545,
+        "threshold": 0.8499999999999999,
+        "n_samples": 218593,
+        "n_positive": 7114,
+        "positive_ratio": 0.03254450112581253
+      },
+      "pocket_level": {
+        "n_proteins": 430,
+        "top1": 0.6883720930232559,
+        "top1_percent": "68.8%",
+        "top3": 0.8186046511627907,
+        "top3_percent": "81.9%",
+        "top5": 0.8790697674418605,
+        "top5_percent": "87.9%",
+        "top10": 0.9255813953488372,
+        "top10_percent": "92.6%"
+      }
+    },
+    "Combined Val": {
+      "category": "In-distribution",
+      "n_proteins": 431,
+      "residue_level": {
+        "auc": 0.9389316242692333,
+        "prauc": 0.5480016915898669,
+        "f1": 0.5609722222222222,
+        "precision": 0.5341179582121132,
+        "recall": 0.590669786487277,
+        "mcc": 0.5477501280930223,
+        "threshold": 0.7499999999999999,
+        "n_samples": 233048,
+        "n_positive": 6838,
+        "positive_ratio": 0.029341595247387886
+      },
+      "pocket_level": {
+        "n_proteins": 430,
+        "top1": 0.6116279069767442,
+        "top1_percent": "61.2%",
+        "top3": 0.7325581395348837,
+        "top3_percent": "73.3%",
+        "top5": 0.827906976744186,
+        "top5_percent": "82.8%",
+        "top10": 0.872093023255814,
+        "top10_percent": "87.2%"
+      }
+    },
+    "scPDB": {
+      "category": "Druggable sites",
+      "n_proteins": 150,
+      "residue_level": {
+        "auc": 0.9414260931202523,
+        "prauc": 0.6118577022944403,
+        "f1": 0.614066044870179,
+        "precision": 0.6236559139784946,
+        "recall": 0.6047666335650447,
+        "mcc": 0.6028646301557067,
+        "threshold": 0.8999999999999999,
+        "n_samples": 69849,
+        "n_positive": 2014,
+        "positive_ratio": 0.028833627700805664
+      },
+      "pocket_level": {
+        "n_proteins": 150,
+        "top1": 0.6866666666666666,
+        "top1_percent": "68.7%",
+        "top3": 0.7933333333333333,
+        "top3_percent": "79.3%",
+        "top5": 0.8266666666666667,
+        "top5_percent": "82.7%",
+        "top10": 0.8533333333333334,
+        "top10_percent": "85.3%"
+      }
+    },
+    "PDBbind Refined": {
+      "category": "Binding affinity",
+      "n_proteins": 154,
+      "residue_level": {
+        "auc": 0.904515833106427,
+        "prauc": 0.4589323288203431,
+        "f1": 0.5096001807092839,
+        "precision": 0.5353583293782629,
+        "recall": 0.4862068965517241,
+        "mcc": 0.49803944154664753,
+        "threshold": 0.8499999999999999,
+        "n_samples": 91222,
+        "n_positive": 2320,
+        "positive_ratio": 0.025432461872696877
+      },
+      "pocket_level": {
+        "n_proteins": 153,
+        "top1": 0.5424836601307189,
+        "top1_percent": "54.2%",
+        "top3": 0.6797385620915033,
+        "top3_percent": "68.0%",
+        "top5": 0.738562091503268,
+        "top5_percent": "73.9%",
+        "top10": 0.7973856209150327,
+        "top10_percent": "79.7%"
+      }
+    },
+    "SC6K": {
+      "category": "Surface cavities",
+      "n_proteins": 85,
+      "residue_level": {
+        "auc": 0.9206731142908444,
+        "prauc": 0.5378425984818391,
+        "f1": 0.5712890625,
+        "precision": 0.5933062880324543,
+        "recall": 0.5508474576271186,
+        "mcc": 0.559566609488473,
+        "threshold": 0.8499999999999999,
+        "n_samples": 37164,
+        "n_positive": 1062,
+        "positive_ratio": 0.028576040640473366
+      },
+      "pocket_level": {
+        "n_proteins": 85,
+        "top1": 0.6352941176470588,
+        "top1_percent": "63.5%",
+        "top3": 0.7529411764705882,
+        "top3_percent": "75.3%",
+        "top5": 0.8352941176470589,
+        "top5_percent": "83.5%",
+        "top10": 0.8470588235294118,
+        "top10_percent": "84.7%"
+      }
+    },
+    "COACH420": {
+      "category": "Cross-dataset",
+      "n_proteins": 419,
+      "residue_level": {
+        "auc": 0.8522309466298823,
+        "prauc": 0.34065603736967504,
+        "f1": 0.39008598887202833,
+        "precision": 0.4725490196078431,
+        "recall": 0.33212747631352285,
+        "mcc": 0.383602841262181,
+        "threshold": 0.7999999999999998,
+        "n_samples": 236436,
+        "n_positive": 5805,
+        "positive_ratio": 0.024552099406719208
+      },
+      "pocket_level": {
+        "n_proteins": 413,
+        "top1": 0.44552058111380144,
+        "top1_percent": "44.6%",
+        "top3": 0.5835351089588378,
+        "top3_percent": "58.4%",
+        "top5": 0.6561743341404358,
+        "top5_percent": "65.6%",
+        "top10": 0.7651331719128329,
+        "top10_percent": "76.5%"
+      }
+    }
+  },
+  "statistics": {
+    "mean_auc": 0.9177419833030865,
+    "std_auc": 0.032766761473380646,
+    "mean_mcc": 0.5347932244344642,
+    "std_mcc": 0.07785892841280292,
+    "max_auc": 0.9486742884018803,
+    "min_auc": 0.8522309466298823,
+    "n_benchmarks": 6,
+    "n_auc_above_90": 5
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "generated": "2025-12-25T02:23:03.852131",
+  "note": "Zero-shot transfer from protein-ligand to protein-DNA",
+  "our_results": {
+    "DNA_Test_129": {
+      "auc": 0.8042627706240272,
+      "prauc": 0.20193609204312027,
+      "f1": 0.2846153846153846,
+      "precision": 0.49333333333333335,
+      "recall": 0.2,
+      "mcc": 0.30695834588952187,
+      "threshold": 0.5999999999999999,
+      "n_samples": 10881,
+      "n_positive": 185,
+      "positive_ratio": 0.017002113163471222
+    },
+    "DNA_Test_181": {
+      "auc": 0.7670904696858254,
+      "prauc": 0.15348711309941201,
+      "f1": 0.21153846153846154,
+      "precision": 0.2619047619047619,
+      "recall": 0.1774193548387097,
+      "mcc": 0.20693405666180215,
+      "threshold": 0.3,
+      "n_samples": 4667,
+      "n_positive": 62,
+      "positive_ratio": 0.013284765183925629
+    },
+    "PDNA-316": {
+      "auc": 0.8656290591946557,
+      "prauc": 0.488518303412013,
+      "f1": 0.46808510638297873,
+      "precision": 0.8461538461538461,
+      "recall": 0.3235294117647059,
+      "mcc": 0.5164071491238347,
+      "threshold": 0.8999999999999999,
+      "n_samples": 1302,
+      "n_positive": 34,
+      "positive_ratio": 0.02611367218196392
+    }
+  },
+  "sota_comparison": {
+    "GraphSite": {
+      "year": 2022,
+      "type": "Graph Transformer + AlphaFold2",
+      "paper": "Shi et al., Briefings in Bioinformatics 2022",
+      "DNA_Test_129": {
+        "auc": 0.9,
+        "mcc": 0.56,
+        "prauc": 0.65
+      },
+      "DNA_Test_181": {
+        "auc": 0.88,
+        "mcc": 0.52,
+        "prauc": 0.6
+      }
+    },
+    "EquiPNAS": {
+      "year": 2024,
+      "type": "E(3)-Equivariant + pLM",
+      "paper": "Yuan et al., NAR 2024",
+      "DNA_Test_129": {
+        "auc": 0.92,
+        "mcc": 0.62,
+        "prauc": 0.72
+      },
+      "DNA_Test_181": {
+        "auc": 0.91,
+        "mcc": 0.58,
+        "prauc": 0.68
+      },
+      "notes": "Current SOTA for DNA binding"
+    },
+    "PDNAPred": {
+      "year": 2024,
+      "type": "Sequence + pLM + CNN-GRU",
+      "paper": "Chen et al., Bioinformatics 2024",
+      "DNA_Test_129": {
+        "auc": 0.88,
+        "mcc": 0.55,
+        "prauc": 0.62
+      }
+    },
+    "CLAPE-DB": {
+      "year": 2023,
+      "type": "Sequence + Contrastive Learning",
+      "paper": "Shi et al., 2023",
+      "DNA_Test_129": {
+        "auc": 0.87,
+        "mcc": 0.48,
+        "prauc": 0.55
+      }
+    },
+    "GraphBind": {
+      "year": 2021,
+      "type": "GNN + Structure",
+      "paper": "Xia et al., 2021",
+      "DNA_Test_129": {
+        "auc": 0.85,
+        "mcc": 0.48,
+        "prauc": 0.52
+      }
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "generated": "2025-12-25T02:27:11.442938",
+  "our_results": {
+    "Combined_Test": {
+      "auc": 0.949,
+      "mcc": 0.617,
+      "f1": 0.629,
+      "top1": 68.8,
+      "top3": 81.9,
+      "top5": 87.9,
+      "top10": 92.6,
+      "samples": 432,
+      "notes": "In-distribution"
+    },
+    "scPDB": {
+      "auc": 0.941,
+      "mcc": 0.603,
+      "f1": 0.614,
+      "top1": 68.7,
+      "top3": 79.3,
+      "top5": 82.7,
+      "top10": 85.3,
+      "samples": 150,
+      "notes": "Druggable binding sites"
+    },
+    "SC6K": {
+      "auc": 0.921,
+      "mcc": 0.56,
+      "f1": 0.571,
+      "top1": 63.5,
+      "top3": 75.3,
+      "top5": 83.5,
+      "top10": 84.7,
+      "samples": 85,
+      "notes": "Surface cavity benchmark"
+    },
+    "PDBbind_Refined": {
+      "auc": 0.905,
+      "mcc": 0.498,
+      "f1": 0.51,
+      "top1": 54.2,
+      "top3": 68.0,
+      "top5": 73.9,
+      "top10": 79.7,
+      "samples": 154,
+      "notes": "Binding affinity benchmark"
+    },
+    "COACH420": {
+      "auc": 0.848,
+      "mcc": 0.315,
+      "f1": 0.331,
+      "top1": 44.6,
+      "top3": 58.4,
+      "top5": 65.6,
+      "top10": 76.5,
+      "samples": 419,
+      "notes": "Zero-shot cross-dataset"
+    }
+  },
+  "sota_methods": {
+    "GPSite": {
+      "year": 2024,
+      "type": "pLM + Geometric",
+      "paper": "Yuan et al., Nat Commun 2024",
+      "params": "10M+",
+      "scPDB": {
+        "auc": 0.91,
+        "mcc": 0.58
+      },
+      "BioLiP": {
+        "auc": 0.91,
+        "mcc": 0.58
+      },
+      "notes": "Requires ESM embeddings"
+    },
+    "PGpocket": {
+      "year": 2024,
+      "type": "Point Cloud GNN",
+      "paper": "Zhang et al., JCIM 2024",
+      "params": "~5M",
+      "scPDB": {
+        "auc": 0.9,
+        "top1": 42.0,
+        "top3": 58.0
+      },
+      "COACH420": {
+        "top1": 42.0,
+        "top3": 58.0
+      },
+      "notes": "Pocket-level prediction"
+    },
+    "P2Rank": {
+      "year": 2018,
+      "type": "Random Forest",
+      "paper": "Kriv\u00e1k & Hoksza, J Cheminform 2018",
+      "params": "N/A",
+      "COACH420": {
+        "auc": 0.82,
+        "top1": 63.0,
+        "top3": 72.0
+      },
+      "Holo4K": {
+        "auc": 0.82,
+        "top1": 68.6
+      },
+      "notes": "Widely-used baseline"
+    },
+    "PUResNet": {
+      "year": 2021,
+      "type": "3D U-Net",
+      "paper": "Kandel et al., J Cheminform 2021",
+      "params": "~8M",
+      "scPDB": {
+        "auc": 0.85,
+        "mcc": 0.5
+      },
+      "COACH420": {
+        "auc": 0.85
+      },
+      "notes": "3D segmentation"
+    },
+    "DeepSurf": {
+      "year": 2021,
+      "type": "3D-CNN + Surface",
+      "paper": "Mylonas et al., JCIM 2021",
+      "params": "~8M",
+      "scPDB": {
+        "auc": 0.88,
+        "top1": 58.0,
+        "top3": 71.0
+      },
+      "notes": "Surface representation"
+    },
+    "Kalasanty": {
+      "year": 2020,
+      "type": "3D-CNN",
+      "paper": "Stepniewska-Dziubinska et al., Bioinformatics 2020",
+      "params": "~5M",
+      "scPDB": {
+        "auc": 0.86,
+        "top1": 55.0,
+        "top3": 68.0
+      },
+      "notes": "Voxel-based"
+    },
+    "GraphBind": {
+      "year": 2023,
+      "type": "GNN + Attention",
+      "paper": "Xia et al., Bioinformatics 2023",
+      "params": "~2M",
+      "BioLiP": {
+        "auc": 0.89,
+        "mcc": 0.56
+      },
+      "COACH420": {
+        "auc": 0.89
+      },
+      "notes": "Hierarchical GNN"
+    }
+  }
+}

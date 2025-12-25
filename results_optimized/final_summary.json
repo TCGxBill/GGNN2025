@@ -1,0 +1,75 @@
+{
+  "Generated": "2025-12-25T02:47:44.688967",
+  "Model": "GeometricGNN (276K params)",
+  "SOTA_Benchmarks": {
+    "Combined Test": {
+      "AUC": 0.949,
+      "MCC": 0.617,
+      "Top1": 68.8,
+      "Category": "In-distribution"
+    },
+    "scPDB": {
+      "AUC": 0.941,
+      "MCC": 0.603,
+      "Top1": 68.7,
+      "Category": "Druggable"
+    },
+    "SC6K": {
+      "AUC": 0.921,
+      "MCC": 0.56,
+      "Top1": 63.5,
+      "Category": "Surface"
+    },
+    "PDBbind": {
+      "AUC": 0.905,
+      "MCC": 0.498,
+      "Top1": 54.2,
+      "Category": "Affinity"
+    }
+  },
+  "Challenging_Benchmarks": {
+    "Binding MOAD": {
+      "AUC": 0.98,
+      "MCC": 0.657,
+      "Top1": 100.0,
+      "Category": "High-quality"
+    },
+    "DUD-E Diverse": {
+      "AUC": 0.865,
+      "MCC": 0.494,
+      "Top1": 56.0,
+      "Category": "Drug targets"
+    },
+    "CryptoBench": {
+      "AUC": 0.855,
+      "MCC": 0.38,
+      "Top1": 50.0,
+      "Category": "Cryptic sites"
+    }
+  },
+  "Large_Scale": {
+    "BioLiP Sample": {
+      "AUC": 0.883,
+      "MCC": 0.448,
+      "Top1": 48.2,
+      "Proteins": 168,
+      "Category": "Diverse"
+    }
+  },
+  "Cross_Dataset": {
+    "COACH420": {
+      "AUC": 0.852,
+      "MCC": 0.384,
+      "Top1": 44.6,
+      "Category": "Zero-shot"
+    }
+  },
+  "Difficult": {
+    "Difficult Cases": {
+      "AUC": 0.699,
+      "MCC": 0.03,
+      "Top1": 10.5,
+      "Category": "Allosteric/Large"
+    }
+  }
+}
