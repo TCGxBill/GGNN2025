@@ -181,7 +181,7 @@ def main():
     # Load data
     print(f"Loading data from {args.data_dir}/{args.split}...")
     graphs = load_dataset_graphs(args.data_dir, args.split, args.max_samples)
-    print(f"✓ Loaded {len(graphs)} protein graphs")
+    print(f"> Loaded {len(graphs)} protein graphs")
     
     # Analyze composition
     print("\nAnalyzing amino acid composition...")
@@ -252,11 +252,11 @@ def main():
     charged_pos_enrich = np.mean([enrichment.get(aa, 1.0) for aa in AA_PROPERTIES['charged_positive']])
     
     if aromatic_enrich > 1.1:
-        print(f"   ✓ Aromatic residues are ENRICHED ({aromatic_enrich:.2f}x) - expected for π-stacking with ligands")
+        print(f"   > Aromatic residues are ENRICHED ({aromatic_enrich:.2f}x) - expected for π-stacking with ligands")
     if hydrophobic_enrich > 1.0:
-        print(f"   ✓ Hydrophobic residues are ENRICHED ({hydrophobic_enrich:.2f}x) - expected for binding pocket lining")
+        print(f"   > Hydrophobic residues are ENRICHED ({hydrophobic_enrich:.2f}x) - expected for binding pocket lining")
     if charged_pos_enrich > 1.0:
-        print(f"   ✓ Positively charged residues are ENRICHED ({charged_pos_enrich:.2f}x) - common for ligand recognition")
+        print(f"   > Positively charged residues are ENRICHED ({charged_pos_enrich:.2f}x) - common for ligand recognition")
     
     # Save results
     output_path = Path(args.output)
@@ -281,7 +281,7 @@ def main():
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)
     
-    print(f"\n✓ Results saved to {output_path}")
+    print(f"\n> Results saved to {output_path}")
 
 
 if __name__ == '__main__':

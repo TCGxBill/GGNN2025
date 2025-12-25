@@ -284,7 +284,7 @@ class BindingSiteTrainer:
                 self.patience_counter = 0
                 
                 self.save_checkpoint(epoch, is_best=True)
-                print(f"✓ Best model saved! (AUC: {val_auc:.4f})")
+                print(f"> Best model saved! (AUC: {val_auc:.4f})")
             else:
                 self.patience_counter += 1
             

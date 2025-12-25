@@ -173,8 +173,8 @@ def download_dataset_pdbs(pdb_ids, output_dir, dataset_name, max_workers=10):
                     failed_ids.append(pdb_id)
                 pbar.update(1)
     
-    print(f"\n   ✓ Downloaded: {success_count}")
-    print(f"   ✓ Already existed: {skip_count}")
+    print(f"\n   > Downloaded: {success_count}")
+    print(f"   > Already existed: {skip_count}")
     print(f"   ✗ Failed: {fail_count}")
     
     # Save metadata
@@ -258,18 +258,18 @@ def main():
     
     if args.dataset == 'all' or args.dataset == 'scpdb':
         success, fail = download_scpdb(base_output / 'scpdb')
-        print(f"\n📊 scPDB: {success} structures ready")
+        print(f"\n scPDB: {success} structures ready")
         
     if args.dataset == 'all' or args.dataset == 'pdbbind':
         success, fail = download_pdbbind(base_output / 'pdbbind_refined')
-        print(f"\n📊 PDBbind Refined: {success} structures ready")
+        print(f"\n PDBbind Refined: {success} structures ready")
         
     if args.dataset == 'all' or args.dataset == 'sc6k':
         success, fail = download_sc6k(base_output / 'sc6k')
-        print(f"\n📊 SC6K: {success} structures ready")
+        print(f"\n SC6K: {success} structures ready")
     
     print("\n" + "="*60)
-    print("✓ Download complete!")
+    print("> Download complete!")
     print("\nNext steps:")
     print("  1. Preprocess: python scripts/preprocess_all.py --dataset scpdb")
     print("  2. Evaluate: python experiments/cross_dataset_eval.py")

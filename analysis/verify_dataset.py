@@ -110,7 +110,7 @@ def main():
     # Load datasets
     processed_dir = 'data/processed/combined'
     
-    print("📊 Loading datasets...")
+    print(" Loading datasets...")
     train_data = load_dataset(processed_dir, 'train')
     val_data = load_dataset(processed_dir, 'val')
     test_data = load_dataset(processed_dir, 'test')
@@ -141,14 +141,14 @@ def main():
     
     # Check for data leakage
     print("\n" + "-"*70)
-    print("🔍 DATA LEAKAGE CHECK")
+    print(" DATA LEAKAGE CHECK")
     print("-"*70)
     
     overlap = check_duplicate_proteins(train_data, val_data, test_data)
     results['leakage_check'] = overlap
     
     if overlap['has_leakage']:
-        print("⚠️  WARNING: Data leakage detected!")
+        print("  WARNING: Data leakage detected!")
         if overlap['train_val_overlap']:
             print(f"  Train-Val overlap: {len(overlap['train_val_overlap'])} proteins")
         if overlap['train_test_overlap']:
@@ -156,7 +156,7 @@ def main():
         if overlap['val_test_overlap']:
             print(f"  Val-Test overlap: {len(overlap['val_test_overlap'])} proteins")
     else:
-        print("✅ No data leakage detected!")
+        print(" No data leakage detected!")
         print("   No protein name overlaps between train/val/test splits")
     
     # Verify features
@@ -169,13 +169,13 @@ def main():
     results['feature_issues'] = issues
     
     if issues:
-        print(f"⚠️  Found {len(issues)} issues:")
+        print(f"  Found {len(issues)} issues:")
         for issue in issues[:10]:
             print(f"   - {issue}")
         if len(issues) > 10:
             print(f"   ... and {len(issues)-10} more")
     else:
-        print("✅ All features verified!")
+        print(" All features verified!")
         print(f"   Feature dim: 29")
         print(f"   Labels: Binary (0/1)")
         print(f"   No NaN values")
@@ -202,9 +202,9 @@ Split Sizes:
   Test:  {len(test_data)} ({len(test_data)/total_proteins*100:.1f}%)
 
 Verification Status:
-  ✅ Data Leakage: {'SAFE' if not overlap['has_leakage'] else 'DETECTED'}
-  ✅ Features: {'VALID' if not issues else 'ISSUES FOUND'}
-  ✅ Labels: Binary (0/1)
+   Data Leakage: {'SAFE' if not overlap['has_leakage'] else 'DETECTED'}
+   Features: {'VALID' if not issues else 'ISSUES FOUND'}
+   Labels: Binary (0/1)
 """)
     
     # Save results
@@ -214,7 +214,7 @@ Verification Status:
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)
     
-    print(f"✓ Report saved to {output_path}")
+    print(f"> Report saved to {output_path}")
     
     # Save text report
     text_report = output_path.with_suffix('.txt')
@@ -231,7 +231,7 @@ Verification Status:
         f.write(f"Data Leakage: {'NONE' if not overlap['has_leakage'] else 'DETECTED'}\n")
         f.write(f"Feature Issues: {len(issues)}\n")
     
-    print(f"✓ Text report saved to {text_report}")
+    print(f"> Text report saved to {text_report}")
 
 
 if __name__ == '__main__':

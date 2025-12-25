@@ -95,7 +95,7 @@ def plot_roc_curve(results, output_dir):
     output_path = Path(output_dir) / 'roc_curve.png'
     plt.savefig(output_path)
     plt.close()
-    print(f"✓ Saved ROC curve to {output_path}")
+    print(f"> Saved ROC curve to {output_path}")
     return output_path
 
 
@@ -144,7 +144,7 @@ def plot_pr_curve(results, output_dir):
     output_path = Path(output_dir) / 'pr_curve.png'
     plt.savefig(output_path)
     plt.close()
-    print(f"✓ Saved PR curve to {output_path}")
+    print(f"> Saved PR curve to {output_path}")
     return output_path
 
 
@@ -189,7 +189,7 @@ def plot_confusion_matrix(results, output_dir):
     output_path = Path(output_dir) / 'confusion_matrix.png'
     plt.savefig(output_path)
     plt.close()
-    print(f"✓ Saved confusion matrix to {output_path}")
+    print(f"> Saved confusion matrix to {output_path}")
     return output_path
 
 
@@ -234,7 +234,7 @@ def plot_training_history(history, output_dir):
     output_path = Path(output_dir) / 'training_history.png'
     plt.savefig(output_path)
     plt.close()
-    print(f"✓ Saved training history to {output_path}")
+    print(f"> Saved training history to {output_path}")
     return output_path
 
 

@@ -115,7 +115,7 @@ def main():
     print("="*70)
     
     # Load model
-    print("\n📊 Loading model...")
+    print("\n Loading model...")
     config = load_config('config_optimized.yaml')
     model = GeometricGNN(config['model'])
     checkpoint = torch.load('checkpoints_optimized/best_model.pth', 
@@ -124,7 +124,7 @@ def main():
     model.eval()
     
     # Get training PDB IDs
-    print("\n📊 Loading training PDB IDs...")
+    print("\n Loading training PDB IDs...")
     train_pdb_ids = set(get_pdb_ids('data/processed/combined', 'train').keys())
     val_pdb_ids = set(get_pdb_ids('data/processed/combined', 'val').keys())
     test_pdb_ids = set(get_pdb_ids('data/processed/combined', 'test').keys())
@@ -143,14 +143,14 @@ def main():
     ]
     
     print("\n" + "-"*70)
-    print("🔬 EVALUATING ON NON-OVERLAPPING PROTEINS ONLY")
+    print(" EVALUATING ON NON-OVERLAPPING PROTEINS ONLY")
     print("-"*70)
     
     results = {}
     
     for bench_path, bench_name in benchmarks:
         if not Path(bench_path).exists():
-            print(f"\n⚠️  {bench_name}: NOT FOUND")
+            print(f"\n  {bench_name}: NOT FOUND")
             continue
         
         # Load only non-overlapping data
@@ -187,7 +187,7 @@ def main():
     
     for name, data in results.items():
         print("{:<15} {:>10} {:>10.4f} {:>10.4f} {:>10.4f} {:>10}".format(
-            name, data['included'], data['auc'], data['f1'], data['mcc'], "✅ CLEAN"))
+            name, data['included'], data['auc'], data['f1'], data['mcc'], " CLEAN"))
     
     # Calculate mean
     aucs = [data['auc'] for data in results.values()]
@@ -204,7 +204,7 @@ def main():
     output_path = Path('results_optimized/honest_benchmark_results.json')
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)
-    print(f"\n✓ Results saved to {output_path}")
+    print(f"\n> Results saved to {output_path}")
 
 
 if __name__ == '__main__':

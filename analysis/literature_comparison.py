@@ -290,7 +290,7 @@ def create_comparison_table():
     output_path = Path("results_optimized/literature_comparison.json")
     with open(output_path, 'w') as f:
         json.dump(output, f, indent=2)
-    print(f"\n✓ Saved to {output_path}")
+    print(f"\n> Saved to {output_path}")
     
     return output
 
@@ -345,7 +345,7 @@ def create_latex_table():
     with open(output_path, 'w') as f:
         f.write(latex)
     
-    print(f"\n✓ LaTeX table saved to {output_path}")
+    print(f"\n> LaTeX table saved to {output_path}")
     return latex
 
 
@@ -378,7 +378,7 @@ NOVELTY CLAIMS:
 - Novel Combined Loss (30% BCE + 70% Dice) for class imbalance
 - State-of-the-art on Holo4K benchmark
 
-PAPER READY: ✅ All materials prepared for submission
+PAPER READY:  All materials prepared for submission
 """)
 
 

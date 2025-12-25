@@ -114,7 +114,7 @@ def run_architecture_ablation(base_config, train_loader, val_loader, test_loader
     """Ablation study on architecture components"""
     results = {}
     
-    print("\n📊 Architecture Ablation Study")
+    print("\n Architecture Ablation Study")
     print("-" * 50)
     
     # 1. Full model (baseline)
@@ -152,7 +152,7 @@ def run_loss_ablation(base_config, train_loader, val_loader, test_loader, device
     """Ablation study on loss functions"""
     results = {}
     
-    print("\n📊 Loss Function Ablation Study")
+    print("\n Loss Function Ablation Study")
     print("-" * 50)
     
     # 1. Combined Loss (baseline - 30% BCE + 70% Dice)
@@ -193,7 +193,7 @@ def save_results(results, output_path):
     """Save results to JSON file"""
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)
-    print(f"\n✓ Saved results to {output_path}")
+    print(f"\n> Saved results to {output_path}")
 
 
 def main():
@@ -219,10 +219,10 @@ def main():
     set_seed(42)
     
     device = torch.device('cpu')
-    print(f"✓ Using device: {device}")
+    print(f"> Using device: {device}")
     
     # Load data
-    print("\n📊 Loading dataset...")
+    print("\n Loading dataset...")
     processed_dir = config['data'].get('processed_dir', 'data/processed/combined')
     train_dataset = load_processed_dataset(processed_dir, 'train')
     val_dataset = load_processed_dataset(processed_dir, 'val')
@@ -232,7 +232,7 @@ def main():
     max_samples = min(500, len(train_dataset))
     train_dataset = train_dataset[:max_samples]
     
-    print(f"✓ Train: {len(train_dataset)} | Val: {len(val_dataset)} | Test: {len(test_dataset)}")
+    print(f"> Train: {len(train_dataset)} | Val: {len(val_dataset)} | Test: {len(test_dataset)}")
     
     batch_size = config['training'].get('batch_size', 32)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)

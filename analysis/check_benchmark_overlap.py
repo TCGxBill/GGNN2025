@@ -36,7 +36,7 @@ def main():
     print("="*70)
     
     # Get training PDB IDs
-    print("\n📊 Loading training data PDB IDs...")
+    print("\n Loading training data PDB IDs...")
     train_pdb_ids, train_files = get_pdb_ids('data/processed/combined', 'train')
     val_pdb_ids, val_files = get_pdb_ids('data/processed/combined', 'val')
     test_pdb_ids, test_files = get_pdb_ids('data/processed/combined', 'test')
@@ -59,14 +59,14 @@ def main():
     ]
     
     print("\n" + "-"*70)
-    print("🔍 CHECKING OVERLAP WITH BENCHMARK DATASETS")
+    print(" CHECKING OVERLAP WITH BENCHMARK DATASETS")
     print("-"*70)
     
     results = {}
     
     for bench_path, bench_name in benchmarks:
         if not Path(bench_path).exists():
-            print(f"\n⚠️  {bench_name}: NOT FOUND")
+            print(f"\n  {bench_name}: NOT FOUND")
             continue
             
         bench_pdb_ids, bench_files = get_pdb_ids(bench_path)
@@ -85,7 +85,7 @@ def main():
             'overlapping_ids': list(overlap_train)[:10]
         }
         
-        status = "⚠️  WARNING" if overlap_pct > 10 else "✅ OK" if overlap_pct > 0 else "✅ CLEAN"
+        status = "  WARNING" if overlap_pct > 10 else " OK" if overlap_pct > 0 else " CLEAN"
         
         print(f"\n{bench_name}:")
         print(f"   Total PDB IDs: {len(bench_pdb_ids)}")
@@ -105,7 +105,7 @@ def main():
     print("-"*70)
     
     for name, data in results.items():
-        status = "⚠️" if data['overlap_pct'] > 10 else "✅"
+        status = "" if data['overlap_pct'] > 10 else ""
         print("{:<25} {:>10} {:>15} {:>14.1f}% {}".format(
             name, data['total'], data['overlap_with_train'], 
             data['overlap_pct'], status))
@@ -120,16 +120,16 @@ def main():
     low_overlap = [name for name, data in results.items() if data['overlap_pct'] <= 10]
     
     if high_overlap:
-        print(f"\n⚠️  HIGH OVERLAP (>30%): {', '.join(high_overlap)}")
+        print(f"\n  HIGH OVERLAP (>30%): {', '.join(high_overlap)}")
         print("   Results on these benchmarks may be INFLATED!")
         print("   These should be reported with caveat in paper.")
     
     if moderate_overlap:
-        print(f"\n⚠️  MODERATE OVERLAP (10-30%): {', '.join(moderate_overlap)}")
+        print(f"\n  MODERATE OVERLAP (10-30%): {', '.join(moderate_overlap)}")
         print("   Results should be interpreted with caution.")
     
     if low_overlap:
-        print(f"\n✅ LOW/NO OVERLAP (≤10%): {', '.join(low_overlap)}")
+        print(f"\n LOW/NO OVERLAP (≤10%): {', '.join(low_overlap)}")
         print("   These are VALID cross-dataset benchmarks.")
         print("   Results on these are scientifically reliable.")
     

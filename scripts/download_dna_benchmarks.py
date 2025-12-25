@@ -94,7 +94,7 @@ def download_dataset(pdb_ids, dataset_name, output_base, max_workers=10):
             else:
                 fail_count += 1
     
-    print(f"  ✓ Downloaded: {success_count}, Failed: {fail_count}")
+    print(f"  > Downloaded: {success_count}, Failed: {fail_count}")
     
     # Save metadata
     metadata = {

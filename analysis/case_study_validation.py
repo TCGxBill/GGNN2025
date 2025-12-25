@@ -227,22 +227,22 @@ def run_case_studies(pdb_ids, model, output_dir, threshold=0.5):
         # Download PDB
         pdb_file = download_pdb(pdb_id, output_dir / "pdbs")
         if pdb_file is None:
-            print(f"   ❌ Failed to download {pdb_id}")
+            print(f"    Failed to download {pdb_id}")
             continue
-        print(f"   ✓ Downloaded PDB file")
+        print(f"   > Downloaded PDB file")
         
         # Predict binding sites
         predictions = predict_binding_sites(model, pdb_file, threshold)
         if predictions is None:
-            print(f"   ❌ Failed to process {pdb_id}")
+            print(f"    Failed to process {pdb_id}")
             continue
-        print(f"   ✓ Predicted {predictions['n_predicted']}/{predictions['n_residues']} residues as binding sites")
+        print(f"   > Predicted {predictions['n_predicted']}/{predictions['n_residues']} residues as binding sites")
         
         # Evaluate against known sites
         evaluation = evaluate_case_study(pdb_id, predictions, case_info['known_binding_residues'])
-        print(f"   📊 Precision: {evaluation['precision']:.3f}")
-        print(f"   📊 Recall: {evaluation['recall']:.3f}")
-        print(f"   📊 F1: {evaluation['f1']:.3f}")
+        print(f"    Precision: {evaluation['precision']:.3f}")
+        print(f"    Recall: {evaluation['recall']:.3f}")
+        print(f"    F1: {evaluation['f1']:.3f}")
         
         # Amino acid composition
         aa_analysis = analyze_amino_acid_composition(predictions)
@@ -296,7 +296,7 @@ def main():
     # Load model
     print("\nLoading model...")
     model = load_model(args.checkpoint, args.config)
-    print("✓ Model loaded")
+    print("> Model loaded")
     
     # Output directory
     output_dir = Path(args.output)
@@ -333,7 +333,7 @@ def main():
             'case_studies': serializable_results
         }, f, indent=2)
     
-    print(f"\n✓ Results saved to {output_file}")
+    print(f"\n> Results saved to {output_file}")
     
     # Summary
     print("\n" + "="*70)

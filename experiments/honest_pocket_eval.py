@@ -121,7 +121,7 @@ def main():
     model.eval()
     
     # Get training IDs
-    print("\n📊 Loading training PDB IDs...")
+    print("\n Loading training PDB IDs...")
     train_ids = set()
     for split in ['train', 'val', 'test']:
         train_ids |= get_pdb_ids('data/processed/combined', split)
@@ -203,7 +203,7 @@ def main():
     # Save
     with open('results_optimized/honest_pocket_results.json', 'w') as f:
         json.dump(all_results, f, indent=2)
-    print("\n✓ Results saved to results_optimized/honest_pocket_results.json")
+    print("\n> Results saved to results_optimized/honest_pocket_results.json")
 
 
 if __name__ == '__main__':

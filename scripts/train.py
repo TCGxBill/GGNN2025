@@ -81,12 +81,12 @@ def main(args):
     
     # Load configuration
     config = load_config(args.config)
-    print(f"✓ Configuration loaded from {args.config}")
+    print(f"> Configuration loaded from {args.config}")
     
     # Set random seed
     seed = args.seed if args.seed is not None else config['project']['random_seed']
     set_seed(seed)
-    print(f"✓ Random seed set to {seed}")
+    print(f"> Random seed set to {seed}")
     
     # Set device
     config_device = config.get('device', 'cpu')
@@ -107,10 +107,10 @@ def main(args):
         else:
             device = torch.device('cpu')
     
-    print(f"✓ Using device: {device}")
+    print(f"> Using device: {device}")
     
     # Load real dataset
-    print("\n📊 Loading dataset...")
+    print("\n Loading dataset...")
     processed_dir = config['data'].get('processed_dir', 'data/processed')
     
     # Check if data exists
@@ -129,7 +129,7 @@ def main(args):
         print("Run: python scripts/preprocess_all.py --dataset pdbbind --split")
         sys.exit(1)
     
-    print(f"✓ Train: {len(train_dataset)} | Val: {len(val_dataset)} | Test: {len(test_dataset)}")
+    print(f"> Train: {len(train_dataset)} | Val: {len(val_dataset)} | Test: {len(test_dataset)}")
     
     # Create data loaders
     batch_size = config['training']['batch_size']
@@ -156,7 +156,7 @@ def main(args):
         num_workers=num_workers
     )
     
-    print(f"✓ Data loaders created (batch_size={batch_size})")
+    print(f"> Data loaders created (batch_size={batch_size})")
     
     # Initialize model
     print("\n🧠 Initializing model...")
@@ -169,26 +169,26 @@ def main(args):
         checkpoint = torch.load(args.resume, map_location=device, weights_only=False)
         if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
             model.load_state_dict(checkpoint['model_state_dict'])
-            print(f"✓ Loaded model state from checkpoint (epoch {checkpoint.get('epoch', 'unknown')})")
+            print(f"> Loaded model state from checkpoint (epoch {checkpoint.get('epoch', 'unknown')})")
         else:
             model.load_state_dict(checkpoint)
-            print("✓ Loaded model state from checkpoint")
+            print("> Loaded model state from checkpoint")
         # Reduce learning rate for fine-tuning
         config['training']['learning_rate'] = config['training']['learning_rate'] * 0.5
-        print(f"✓ Reduced learning rate to {config['training']['learning_rate']} for fine-tuning")
+        print(f"> Reduced learning rate to {config['training']['learning_rate']} for fine-tuning")
     
     num_params = sum(p.numel() for p in model.parameters())
-    print(f"✓ Model: {model_config['type']}")
-    print(f"✓ Parameters: {num_params:,}")
+    print(f"> Model: {model_config['type']}")
+    print(f"> Parameters: {num_params:,}")
     
     # Initialize trainer
     print("\n🚀 Initializing trainer...")
     training_config = {**config['training'], **config['logging'], **config['paths']}
     trainer = BindingSiteTrainer(model, training_config, device=device)
     
-    print(f"✓ Optimizer: {config['training']['optimizer']}")
-    print(f"✓ Learning rate: {config['training']['learning_rate']}")
-    print(f"✓ Loss function: {config['training']['loss_fn']}")
+    print(f"> Optimizer: {config['training']['optimizer']}")
+    print(f"> Learning rate: {config['training']['learning_rate']}")
+    print(f"> Loss function: {config['training']['loss_fn']}")
     
     # Train model
     print("\n" + "="*70)
@@ -232,7 +232,7 @@ def main(args):
         }
         json.dump(serializable_metrics, f, indent=2)
     
-    print(f"\n✓ Results saved to {results_path}")
+    print(f"\n> Results saved to {results_path}")
     
     print("\n" + "="*70)
     print(" "*20 + "TRAINING COMPLETED!")
@@ -286,5 +286,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\nTraining interrupted by user")
     except Exception as e:
-        print(f"\n\n❌ Error: {str(e)}")
+        print(f"\n\n Error: {str(e)}")
         raise
