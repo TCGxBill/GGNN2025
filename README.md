@@ -185,7 +185,9 @@ GGNN2025/
 ├── tests/test_full_pipeline.py
 ├── config_optimized.yaml             # Training configuration
 ├── requirements.txt                  # Dependencies
-├── GGNN2025.tex                      # Paper manuscript
+├── paper/
+│   ├── GGNN2025.tex                  # Paper manuscript
+│   └── GGNN2025.pdf                  # Compiled PDF
 ├── LICENSE                           # MIT License
 └── README.md
 ```
