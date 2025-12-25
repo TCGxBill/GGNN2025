@@ -158,31 +158,35 @@ print(f"Predicted binding residues: {binding_residues.sum()}")
 ```
 GGNN2025/
 ├── src/
-│   ├── models/
-│   │   └── gcn_geometric.py      # GATv2 model architecture
+│   ├── models/gcn_geometric.py       # GATv2 model architecture
 │   ├── data/
-│   │   ├── preprocessor.py       # PDB parsing, feature extraction
-│   │   └── graph_builder.py      # Graph construction
-│   ├── training/
-│   │   └── trainer.py            # Training loop, Combined Loss
-│   └── evaluation/
-│       └── metrics.py            # AUC, MCC, F1 metrics
+│   │   ├── preprocessor.py           # PDB parsing, feature extraction
+│   │   └── graph_builder.py          # Graph construction
+│   ├── training/trainer.py           # Training loop, Combined Loss
+│   └── evaluation/metrics.py         # AUC, MCC, F1 metrics
 ├── scripts/
-│   ├── train.py                  # Main training script
-│   ├── preprocess_all.py         # Data preprocessing
-│   └── visualize_results.py      # Generate figures
+│   ├── train.py                      # Main training script
+│   ├── preprocess_all.py             # Data preprocessing
+│   ├── visualize_results.py          # Generate figures
+│   └── download_benchmark_datasets.py
 ├── experiments/
-│   ├── comprehensive_eval.py     # Multi-benchmark evaluation
-│   ├── cross_dataset_eval.py     # Cross-dataset testing
-│   └── pocket_level_eval.py      # Pocket success rates
+│   ├── comprehensive_eval.py         # Multi-benchmark evaluation
+│   ├── cross_dataset_eval.py         # Cross-dataset testing
+│   ├── pocket_level_eval.py          # Pocket success rates
+│   └── challenging_eval.py           # Cryptic/difficult sites
+├── analysis/
+│   ├── amino_acid_enrichment.py      # AA composition analysis
+│   └── case_study_validation.py      # Biological validation
 ├── checkpoints_optimized/
-│   └── best_model.pth            # Pre-trained weights (3.4MB)
+│   └── best_model.pth                # Pre-trained weights (3.4MB)
 ├── results_optimized/
-│   ├── figures/                  # Publication figures
-│   └── *.json                    # Evaluation results
-├── config_optimized.yaml         # Training configuration
-├── requirements.txt              # Dependencies
-├── GGNN2025.tex                  # Paper manuscript
+│   ├── figures/                      # Publication figures (9 PNG)
+│   └── *.json                        # Evaluation results
+├── tests/test_full_pipeline.py
+├── config_optimized.yaml             # Training configuration
+├── requirements.txt                  # Dependencies
+├── GGNN2025.tex                      # Paper manuscript
+├── LICENSE                           # MIT License
 └── README.md
 ```
 
