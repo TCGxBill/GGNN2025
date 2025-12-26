@@ -57,6 +57,96 @@ pip install -r requirements.txt
 
 ---
 
+## Quick Start (Using Pre-trained Model)
+
+**This repository includes a pre-trained model ready to use!**
+
+### Option 1: Predict on Your Own PDB File
+
+```python
+import torch
+import yaml
+import sys
+sys.path.insert(0, 'src')
+
+from models.gcn_geometric import GeometricGNN
+from data.preprocessor import ProteinPreprocessor
+from data.graph_builder import ProteinGraphBuilder
+
+# Load config and model
+with open('config_optimized.yaml', 'r') as f:
+    config = yaml.safe_load(f)
+
+model = GeometricGNN(config['model'])
+checkpoint = torch.load('checkpoints_optimized/best_model.pth', 
+                        map_location='cpu', weights_only=False)
+model.load_state_dict(checkpoint['model_state_dict'])
+model.eval()
+
+# Process your protein
+preprocessor = ProteinPreprocessor(config['preprocessing'])
+graph_builder = ProteinGraphBuilder(config['preprocessing'])
+
+# Load and predict
+data = preprocessor.process_pdb('path/to/your_protein.pdb')
+graph = graph_builder.build_graph(
+    data['node_features'], 
+    data['coordinates'], 
+    data['labels'] if 'labels' in data else None
+)
+
+with torch.no_grad():
+    predictions = torch.sigmoid(model(graph))
+    binding_probs = predictions.squeeze().numpy()
+
+# Get binding residues (threshold = 0.85)
+binding_residues = [i for i, p in enumerate(binding_probs) if p > 0.85]
+print(f"Predicted {len(binding_residues)} binding residues")
+print(f"Residue indices: {binding_residues}")
+```
+
+### Option 2: Run Benchmark Evaluation
+
+```bash
+# Evaluate on all benchmarks (uses pre-processed data in data/processed/)
+python experiments/comprehensive_eval.py
+
+# Results saved to results_optimized/comprehensive_benchmark_results.json
+```
+
+### Option 3: Evaluate on Non-overlapping Proteins Only
+
+```bash
+# For honest evaluation without training data overlap
+python experiments/honest_eval.py
+
+# Results saved to results_optimized/honest_benchmark_results.json
+```
+
+### Pre-trained Model Details
+
+| Property | Value |
+|----------|-------|
+| **Model file** | `checkpoints_optimized/best_model.pth` |
+| **Parameters** | 276,097 (1.1 MB) |
+| **Architecture** | GATv2 with geometric edge encoding |
+| **Input** | PDB file (any protein structure) |
+| **Output** | Per-residue binding probability [0, 1] |
+| **Threshold** | 0.85 (optimized for class imbalance) |
+| **Inference time** | ~6ms per protein on CPU |
+
+### Available Benchmark Data
+
+Pre-processed benchmark data in `data/processed/`:
+- `combined/test/` - 432 proteins (Combined Test Set)
+- `scpdb/` - 150 druggable binding sites
+- `coach420/` - 420 diverse proteins
+- `pdbbind/` - 154 protein-ligand complexes
+- `biolip/` - 168 biologically relevant sites
+- `cryptobench/` - 22 cryptic binding sites
+
+---
+
 ## Reproducing Results
 
 ### Step 1: Download Data
