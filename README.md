@@ -321,7 +321,7 @@ L = 0.3 * BCE_weighted + 0.7 * Dice
   title={GGNN 2025: A Lightweight Geometric Graph Neural Network 
          for Protein-Ligand Binding Site Prediction},
   author={Nguyen, Vu Trong Nhan},
-  journal={bioRxiv},
+  journal={Zenodo},
   year={2025}
 }
 ```
