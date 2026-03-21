@@ -4,8 +4,11 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-BioGenesis-brightgreen.svg)](https://biogenesis-gules.vercel.app)
 
 A lightweight Geometric Graph Neural Network for predicting protein-ligand binding sites at the residue level. Achieves **state-of-the-art performance** with only **276K parameters** - 36x smaller than pLM-based methods.
+
+> 🌐 **[Try the Live Demo → BioGenesis](https://biogenesis-gules.vercel.app)** — Upload a PDB file and visualize predicted binding sites in 3D.
 
 ## Key Results
 
@@ -338,4 +341,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-*Last updated: December 25, 2025*
+*Last updated: March 21, 2026*
