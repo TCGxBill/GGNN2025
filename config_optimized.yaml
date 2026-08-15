@@ -35,7 +35,7 @@ data:
 
 model:
   type: "gcn_geometric"
-  input_dim: 29
+  input_dim: 32              # 27 (aa+bio+ss+sasa) + angle + dihedral + hse_up + hse_down + density
   hidden_dims: [256, 128, 64]  # Larger model for higher capacity
   output_dim: 1
   num_layers: 3
@@ -44,6 +44,8 @@ model:
   use_attention: true
   attention_heads: 4         # Divisible into hidden dims
   use_geometric: true
+  edge_dim: 20
+  context_dim: 32            # Global-context readout injected per residue
   geometric_dim: 32
   distance_bins: 16
 
@@ -59,11 +61,18 @@ training:
   patience: 8
   factor: 0.5
   
-  # Combined Loss: BCE for AUC + Dice for F1
+  # Main loss (paper contribution #2): BCE for AUC + Dice for F1/overlap
   loss_fn: "combined"
-  bce_weight: 0.3           # 30% BCE (for AUC)
-  dice_weight: 0.7          # 70% Dice (for F1)
-  pos_weight: 12.0          # Moderate class weighting
+  bce_weight: 0.3
+  dice_weight: 0.7
+  pos_weight: 12.0
+
+  # Optional generalization for hard subsets (large / cryptic): loss_fn: combined_ft
+  # Dice = the alpha=beta=0.5, gamma=1 special case of Focal-Tversky.
+  ft_weight: 0.7
+  tversky_alpha: 0.3        # FP penalty
+  tversky_beta: 0.7         # FN penalty (higher = more recall on buried/cryptic)
+  focal_gamma: 1.33         # focus on hard examples (large / multi-domain)
   
   early_stopping: true
   early_stopping_patience: 12

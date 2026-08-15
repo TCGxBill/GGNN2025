@@ -5,7 +5,10 @@ Training Pipeline for Binding Site Prediction
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except Exception:
+    SummaryWriter = None
 from tqdm import tqdm
 import numpy as np
 import os
@@ -36,7 +39,7 @@ class BindingSiteTrainer:
         self.patience_counter = 0
         
         # Logging
-        if config.get('use_tensorboard', True):
+        if config.get('use_tensorboard', True) and SummaryWriter is not None:
             log_dir = config.get('tensorboard_dir', './runs')
             self.writer = SummaryWriter(log_dir)
         else:
@@ -85,7 +88,22 @@ class BindingSiteTrainer:
             dice_weight = self.config.get('dice_weight', 0.5)
             pos_weight = self.config.get('pos_weight', 10.0)
             print(f"   Using Combined Loss (BCE:{bce_weight}, Dice:{dice_weight})")
-            return CombinedLoss(bce_weight=bce_weight, dice_weight=dice_weight, pos_weight=pos_weight)
+            return CombinedLoss(bce_weight=bce_weight, dice_weight=dice_weight, pos_weight=pos_weight).to(self.device)
+        
+        elif loss_type == 'combined_ft':
+            # Combined BCE + Focal-Tversky: stronger FN penalty + hard-example
+            # focusing for severe imbalance (large / multi-domain proteins).
+            bce_weight = self.config.get('bce_weight', 0.3)
+            ft_weight = self.config.get('ft_weight', 0.7)
+            pos_weight = self.config.get('pos_weight', 12.0)
+            alpha = self.config.get('tversky_alpha', 0.3)  # FP weight
+            beta = self.config.get('tversky_beta', 0.7)    # FN weight (recall)
+            gamma = self.config.get('focal_gamma', 1.33)   # focusing
+            print(f"   Using Combined Focal-Tversky (BCE:{bce_weight}, FT:{ft_weight}, a={alpha}, b={beta}, g={gamma})")
+            return CombinedFocalTverskyLoss(
+                bce_weight=bce_weight, ft_weight=ft_weight, pos_weight=pos_weight,
+                alpha=alpha, beta=beta, gamma=gamma
+            ).to(self.device)
         
         else:
             raise ValueError(f"Unknown loss function: {loss_type}")
@@ -302,6 +320,14 @@ class BindingSiteTrainer:
         history_path = self.checkpoint_dir / 'training_history.json'
         with open(history_path, 'w') as f:
             json.dump(history, f, indent=2)
+
+        # Always keep the final-epoch model too (safeguard against losing a run)
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'best_val_auc': self.best_val_auc,
+            'config': self.config,
+        }, self.checkpoint_dir / 'last_model.pth')
         
         print(f"\n{'='*50}")
         print(f"Training completed!")
@@ -428,6 +454,45 @@ class CombinedLoss(nn.Module):
         bce_loss = self.bce(inputs, targets)
         dice_loss = self.dice(inputs, targets)
         return self.bce_weight * bce_loss + self.dice_weight * dice_loss
+
+
+class FocalTverskyLoss(nn.Module):
+    """
+    Focal-Tversky Loss. Tversky index with beta>alpha weights false negatives
+    more (raises recall on rare positives); gamma>1 focuses on hard examples.
+    Reduces to Dice at alpha=beta=0.5, gamma=1.
+    """
+    
+    def __init__(self, alpha=0.3, beta=0.7, gamma=1.33, smooth=1.0):
+        super().__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.smooth = smooth
+    
+    def forward(self, inputs, targets):
+        probs = torch.sigmoid(inputs).view(-1)
+        targets = targets.view(-1)
+        TP = (probs * targets).sum()
+        FP = ((1 - targets) * probs).sum()
+        FN = (targets * (1 - probs)).sum()
+        tversky = (TP + self.smooth) / (TP + self.alpha * FP + self.beta * FN + self.smooth)
+        return (1 - tversky) ** self.gamma
+
+
+class CombinedFocalTverskyLoss(nn.Module):
+    """Weighted BCE (AUC) + Focal-Tversky (recall/F1 on rare, hard positives)."""
+    
+    def __init__(self, bce_weight=0.3, ft_weight=0.7, pos_weight=12.0,
+                 alpha=0.3, beta=0.7, gamma=1.33):
+        super().__init__()
+        self.bce_weight = bce_weight
+        self.ft_weight = ft_weight
+        self.bce = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pos_weight]))
+        self.ft = FocalTverskyLoss(alpha=alpha, beta=beta, gamma=gamma)
+    
+    def forward(self, inputs, targets):
+        return self.bce_weight * self.bce(inputs, targets) + self.ft_weight * self.ft(inputs, targets)
 
 
 if __name__ == "__main__":

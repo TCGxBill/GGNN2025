@@ -57,18 +57,30 @@ class GeometricGNN(nn.Module):
                 
             in_dim = out_dim
             
-        # Output layers
+        # Global context: whole-protein readout injected back per node.
+        # Helps large / multi-domain proteins localize the true pocket.
+        ctx_dim = config.get('context_dim', 32)
+        last = hidden_dims[-1]
+        self.ctx_mlp = Sequential(
+            Linear(2 * last, ctx_dim),
+            ReLU()
+        )
+
+        # Output layers (node repr + global context)
         self.output_head = Sequential(
-            Linear(hidden_dims[-1], hidden_dims[-1] // 2),
+            Linear(last + ctx_dim, last // 2),
             ReLU(),
             Dropout(dropout),
-            Linear(hidden_dims[-1] // 2, output_dim)
+            Linear(last // 2, output_dim)
         )
         
         self.dropout = Dropout(dropout)
         
     def forward(self, data):
         x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
+        batch = getattr(data, 'batch', None)
+        if batch is None:
+            batch = torch.zeros(x.size(0), dtype=torch.long, device=x.device)
         
         # Input encoding
         x = self.input_emb(x)
@@ -85,7 +97,12 @@ class GeometricGNN(nn.Module):
             
             # Residual connection
             x = x + skip(x_in)
-            
+        
+        # Global context: pool whole protein, broadcast back to each residue
+        g = torch.cat([global_mean_pool(x, batch), global_max_pool(x, batch)], dim=1)
+        g = self.ctx_mlp(g)
+        x = torch.cat([x, g[batch]], dim=1)
+        
         # Output
         out = self.output_head(x)
         

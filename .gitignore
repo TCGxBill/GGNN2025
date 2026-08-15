@@ -86,3 +86,17 @@ runs_*/
 
 # Paper (hidden until publication)
 paper/
+
+# === Local-only: dữ liệu lớn & backup (KHÔNG commit) ===
+external_data/
+backups_29/
+_unused/
+..bfg-report/
+venv/
+
+# Run artifacts: giữ config/log, bỏ trọng số
+runs/**/*.pth
+
+# File nháp ở thư mục gốc
+/pred_*.json
+/test_moad.json

@@ -39,15 +39,15 @@ class ProteinGraphBuilder:
         # Compute geometric node features
         angles = self.compute_angles(coordinates)  # (N,)
         dihedrals = self.compute_dihedrals(coordinates)  # (N,)
-        
-        # Concatenate to node features
-        # geometric_feats = np.stack([angles, dihedrals], axis=1) # (N, 2)
-        # node_features = np.concatenate([node_features, geometric_feats], axis=1)
-        
-        # NOTE: For now, avoiding changing input_dim abruptly without config update.
-        # But per plan, we WANT to include them. 
-        # Let's concatenate them.
-        geometric_feats = np.stack([angles, dihedrals], axis=1)
+
+        # Burial descriptors (cheap, structure-only; target buried/cryptic pockets)
+        hse_up, hse_down = self.compute_hse(coordinates)  # (N,), (N,)
+        density = self.compute_local_density(coordinates)  # (N,)
+
+        # Concatenate geometric + burial features to node features
+        geometric_feats = np.stack(
+            [angles, dihedrals, hse_up, hse_down, density], axis=1
+        )  # (N, 5)
         node_features = np.concatenate([node_features, geometric_feats], axis=1)
 
         # Convert to tensors
@@ -126,7 +126,7 @@ class ProteinGraphBuilder:
         if len(edge_list) == 0:
             # If no edges, create self-loops
             edge_list = [[i, i] for i in range(n_nodes)]
-            edge_features = [np.zeros(5) for _ in range(n_nodes)]
+            edge_features = [np.zeros(20) for _ in range(n_nodes)]
         
         edge_index = np.array(edge_list).T  # (2, E)
         edge_attr = np.array(edge_features)  # (E, D)
@@ -189,8 +189,6 @@ class ProteinGraphBuilder:
             data.edge_attr = torch.cat([data.edge_attr, seq_edge_attr], dim=0)
         
         return data
-    
-        return np.array(angles)
 
     def compute_angles(self, coordinates):
         """
@@ -219,9 +217,58 @@ class ProteinGraphBuilder:
             angles[i+1] = angle # Assign to middle residue
             
         return angles
-    
-        return np.array(dihedrals)
-        
+
+    def compute_hse(self, coordinates, radius=13.0):
+        """
+        Half-Sphere Exposure: directional burial measure.
+        For each residue, split neighbors within `radius` into the half-space
+        pointing toward the side chain (up) vs the opposite (down), using the
+        CA(i-1)/CA(i+1) pseudo-direction. Buried residues have high up-count.
+        Values are standardized per protein (scale-free).
+        Returns (hse_up, hse_down), each (N,).
+        """
+        n = len(coordinates)
+        up = np.zeros(n, dtype=np.float32)
+        down = np.zeros(n, dtype=np.float32)
+        if n < 3:
+            return up, down
+
+        dm = distance_matrix(coordinates, coordinates)
+        for i in range(n):
+            prev_i = coordinates[i - 1] if i > 0 else coordinates[i]
+            next_i = coordinates[i + 1] if i < n - 1 else coordinates[i]
+            u = -((prev_i - coordinates[i]) + (next_i - coordinates[i]))
+            nu = np.linalg.norm(u)
+            if nu < 1e-6:
+                continue
+            u = u / nu
+
+            neighbors = np.where((dm[i] < radius) & (dm[i] > 0))[0]
+            for j in neighbors:
+                vec = coordinates[j] - coordinates[i]
+                if np.dot(vec, u) > 0:
+                    up[i] += 1
+                else:
+                    down[i] += 1
+
+        up = (up - up.mean()) / (up.std() + 1e-6)
+        down = (down - down.mean()) / (down.std() + 1e-6)
+        return up.astype(np.float32), down.astype(np.float32)
+
+    def compute_local_density(self, coordinates, radius=10.0):
+        """
+        Number of residues within `radius` (contact number / burial proxy).
+        Standardized per protein: buried > 0, exposed < 0.
+        Returns (N,).
+        """
+        n = len(coordinates)
+        if n < 2:
+            return np.zeros(n, dtype=np.float32)
+        dm = distance_matrix(coordinates, coordinates)
+        counts = ((dm < radius) & (dm > 0)).sum(axis=1).astype(np.float32)
+        counts = (counts - counts.mean()) / (counts.std() + 1e-6)
+        return counts.astype(np.float32)
+
     def compute_dihedrals(self, coordinates):
         """
         Compute dihedral angles for quadruplets of consecutive residues

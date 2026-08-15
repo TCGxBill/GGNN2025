@@ -135,7 +135,8 @@ def main():
     print("Loading model...")
     config = load_config('config_optimized.yaml')
     model = load_model('checkpoints_optimized/best_model.pth', config)
-    print("Model loaded (276K parameters)\n")
+    n_params = sum(p.numel() for p in model.parameters())
+    print(f"Model loaded ({n_params:,} parameters)\n")
     
     # Challenging benchmarks
     benchmarks = [

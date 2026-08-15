@@ -122,7 +122,7 @@ def main():
     
     # Analyze each split
     print("\n" + "-"*70)
-    print("📈 DATASET STATISTICS")
+    print(" DATASET STATISTICS")
     print("-"*70)
     
     results = {}
