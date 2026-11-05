@@ -1,0 +1,9 @@
+quantity,estimate,ci_lo,ci_hi,note
+GGNN AUPRC,0.4963,0.4525,0.5339,
+GGNN AUROC,0.8760,0.8596,0.8907,
+P2Rank AUPRC,0.4472,0.4096,0.4834,
+P2Rank AUROC,0.8263,0.7927,0.8560,
+Fpocket AUPRC,0.1902,0.1645,0.2204,
+Fpocket AUROC,0.6633,0.6341,0.6937,
+GGNN - P2Rank AUPRC,+0.0470,-0.0063,+0.1004,GGNN higher in 95.4% of 2000 protein-level replicates
+GGNN - P2Rank AUROC,+0.0488,+0.0170,+0.0838,GGNN higher in 100.0% of 2000 protein-level replicates

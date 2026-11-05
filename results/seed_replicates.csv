@@ -1,0 +1,4 @@
+config,n_seeds,seeds,auprc_mean,auprc_sd,auprc_min,auprc_max,auroc_mean,auroc_sd,homology_gap_mean,best_epoch_mean
+B4_global,3,1;2;42,0.4224,0.0207,0.4039,0.4448,0.8523,0.0112,0.4139,95.0000
+B4_localframe,3,1;2;42,0.4713,0.0094,0.4612,0.4798,0.8643,0.0064,0.3648,91.3333
+B5_localframe,3,1;2;42,0.4945,0.0095,0.4842,0.5029,0.8668,0.0092,0.3247,78.0000

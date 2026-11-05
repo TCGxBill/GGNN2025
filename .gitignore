@@ -27,6 +27,7 @@ venv/
 ENV/
 env/
 .venv/
+bfg-report/
 
 # IDE
 .idea/
@@ -59,6 +60,8 @@ data/processed/*/test/
 # Checkpoints (keep only best)
 checkpoints_*/checkpoint_epoch_*.pth
 *.zip
+checkpoints_optimized/
+backups_29/
 
 # Runs/Logs
 runs_*/
@@ -93,10 +96,18 @@ backups_29/
 _unused/
 ..bfg-report/
 venv/
+tests/
+Test_pro_pretest/
+__pycache__/
+sandbox/
 
 # Run artifacts: giữ config/log, bỏ trọng số
 runs/**/*.pth
+runs_*/
 
 # File nháp ở thư mục gốc
 /pred_*.json
 /test_moad.json
+
+# Markdown files unsed
+logs.md 

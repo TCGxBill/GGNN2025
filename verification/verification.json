@@ -1,0 +1,81 @@
+{
+  "configuration": {
+    "type": "gcn_geometric",
+    "input_dim": 32,
+    "hidden_dims": [
+      256,
+      128,
+      64
+    ],
+    "output_dim": 1,
+    "num_layers": 3,
+    "dropout": 0.15,
+    "batch_norm": true,
+    "use_attention": true,
+    "attention_heads": 4,
+    "use_geometric": true,
+    "edge_dim": 20,
+    "context_dim": 32,
+    "geometric_dim": 32,
+    "distance_bins": 16
+  },
+  "trainable_parameters": 282017,
+  "state_tensor_elements": 283429,
+  "checkpoint_sha256": "783f4b9f6a4b533b55df1fdef101641c6099a48c0eea9654df720703828fe1d6",
+  "splits": {
+    "val": {
+      "n_proteins": 302,
+      "n_residues": 144730,
+      "positives": 8692,
+      "auprc": 0.6695685942283253,
+      "auroc": 0.9305830434367344,
+      "tp": 5128,
+      "fp": 2709,
+      "fn": 3564,
+      "tn": 133329,
+      "rederived_threshold": 0.9087636470794678
+    },
+    "T_clean": {
+      "n_proteins": 244,
+      "n_residues": 146312,
+      "positives": 8868,
+      "auprc": 0.4610649933684158,
+      "auroc": 0.8647473862877841,
+      "tp": 3257,
+      "fp": 2486,
+      "fn": 5611,
+      "tn": 134958
+    },
+    "T_leaky": {
+      "n_proteins": 316,
+      "n_residues": 194579,
+      "positives": 12429,
+      "auprc": 0.8206881108954177,
+      "auroc": 0.9776020895585084,
+      "tp": 10368,
+      "fp": 4552,
+      "fn": 2061,
+      "tn": 177598
+    }
+  },
+  "paired_seed_test": {
+    "global": [
+      0.4447500895725781,
+      0.41868394389113645,
+      0.4038507004219803
+    ],
+    "local": [
+      0.4797710549221378,
+      0.4729746865298247,
+      0.4612314442400217
+    ],
+    "mean_difference": 0.04889748393542979,
+    "relative_gain": 0.11575334878098542,
+    "t": 6.989984205260051,
+    "p": 0.019859054478022522,
+    "ci95": [
+      0.018798861884991223,
+      0.07899610598586836
+    ]
+  }
+}

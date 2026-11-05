@@ -1,0 +1,55 @@
+{
+  "B5_train": {
+    "n_proteins": 3412,
+    "dimensions": [
+      [
+        32,
+        20
+      ]
+    ],
+    "n_residues": 1589800,
+    "zero_ss_residues": 1589800,
+    "default_accessibility_residues": 1589800
+  },
+  "val": {
+    "n_proteins": 302,
+    "dimensions": [
+      [
+        32,
+        20
+      ]
+    ],
+    "n_residues": 144730,
+    "zero_ss_residues": 144730,
+    "default_accessibility_residues": 144730
+  },
+  "T_clean": {
+    "n_proteins": 244,
+    "dimensions": [
+      [
+        32,
+        20
+      ]
+    ],
+    "n_residues": 146312,
+    "zero_ss_residues": 146312,
+    "default_accessibility_residues": 146312
+  },
+  "T_leaky": {
+    "n_proteins": 316,
+    "dimensions": [
+      [
+        32,
+        20
+      ]
+    ],
+    "n_residues": 194579,
+    "zero_ss_residues": 194579,
+    "default_accessibility_residues": 194579
+  },
+  "frame_determinant": {
+    "minimum": -1.000000238418579,
+    "maximum": -0.9999998807907104,
+    "note": "Orthogonal basis determinant -1 for nondegenerate frame; not SO(3)"
+  }
+}

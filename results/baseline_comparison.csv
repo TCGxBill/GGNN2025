@@ -1,0 +1,7 @@
+subset,method,n_res,AUPRC,AUROC,F1_test_tuned,MCC_test_tuned
+all 246 proteins,Fpocket,146596,0.1902,0.6633,0.3212,0.2616
+all 246 proteins,P2Rank,146596,0.4472,0.8263,0.4935,0.4517
+all 246 proteins,GGNN 2025,146596,0.4963,0.876,0.4824,0.4407
+excluding chen11 homologs,Fpocket,139484,0.185,0.6561,0.3135,0.2522
+excluding chen11 homologs,P2Rank,139484,0.4482,0.8241,0.4954,0.453
+excluding chen11 homologs,GGNN 2025,139484,0.4942,0.8767,0.4822,0.4388

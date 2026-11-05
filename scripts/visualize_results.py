@@ -53,25 +53,60 @@ def load_training_history(checkpoints_dir):
     return None
 
 
+def load_json(path):
+    path = Path(path)
+    if path.exists():
+        with open(path) as f:
+            return json.load(f)
+    return None
+
+
+def compute_real_metrics(config_path='config_optimized.yaml'):
+    """
+    Load the current best_model.pth and run it on the test set to get REAL
+    ROC / PR curves and confusion counts (no fabricated curves).
+    Returns the metrics dict from evaluate_model, or None on failure.
+    """
+    try:
+        import yaml
+        from src.models.gcn_geometric import GeometricGNN
+        from src.evaluation.metrics import evaluate_model
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+        device = torch.device('cpu')
+        model = GeometricGNN(config['model']).to(device)
+        ckpt_path = Path(config['paths']['checkpoint_dir']) / 'best_model.pth'
+        ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
+        state = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
+        model.load_state_dict(state)
+        model.eval()
+        test_dir = Path(config['data']['processed_dir']) / 'test'
+        dataset = [torch.load(p, weights_only=False) for p in sorted(test_dir.glob('*.pt'))]
+        loader = DataLoader(dataset, batch_size=config['training'].get('batch_size', 32))
+        print(f"> Computing real metrics on {len(dataset)} test proteins ({ckpt_path})")
+        return evaluate_model(model, loader, device=device)
+    except Exception as e:
+        print(f"⚠ compute_real_metrics failed ({e}); falling back to test_results.json")
+        return None
+
+
 def plot_roc_curve(results, output_dir):
     """Plot ROC curve with AUC"""
     fig, ax = plt.subplots(figsize=(8, 7))
     
-    # Get values from results
+    roc = results.get('roc_curve')
+    if roc is None:
+        print("⚠ No real ROC data available; skipping roc_curve.png")
+        plt.close()
+        return None
+
     auc_score = results['auc']
-    
-    # Create smooth ROC curve based on results
-    # Approximate curve using known points
+    fpr = np.asarray(roc['fpr'])
+    tpr = np.asarray(roc['tpr'])
     sensitivity = results['recall']
     specificity = results['specificity']
-    
-    # Generate smooth curve
-    fpr = np.linspace(0, 1, 100)
-    # Use a reasonable curve shape based on AUC
-    tpr = 1 - (1 - fpr) ** (1 / (1 - auc_score + 0.01))
-    tpr = np.clip(tpr, 0, 1)
-    
-    # Plot
+
+    # Plot (real curve)
     ax.plot(fpr, tpr, color='#2E86AB', linewidth=2.5, 
             label=f'Our Model (AUC = {auc_score:.4f})')
     ax.plot([0, 1], [0, 1], 'k--', linewidth=1.5, alpha=0.7, label='Random (AUC = 0.5)')
@@ -106,14 +141,15 @@ def plot_pr_curve(results, output_dir):
     precision = results['precision']
     recall = results['recall']
     f1 = results['f1']
-    avg_precision = results.get('average_precision', precision * recall / (precision + recall + 1e-8) * 2)
-    
-    # Generate smooth PR curve
-    recall_vals = np.linspace(0, 1, 100)
-    # Approximate precision based on known values
-    precision_vals = avg_precision * (1 - np.abs(recall_vals - recall) / max(recall, 1-recall+0.01))
-    precision_vals = np.clip(precision_vals, 0, 1)
-    
+    pr = results.get('pr_curve')
+    if pr is None:
+        print("⚠ No real PR data available; skipping pr_curve.png")
+        plt.close()
+        return None
+    avg_precision = pr.get('average_precision', results.get('average_precision', 0.0))
+    recall_vals = np.asarray(pr['recall'])
+    precision_vals = np.asarray(pr['precision'])
+
     ax.plot(recall_vals, precision_vals, color='#28A745', linewidth=2.5,
             label=f'Our Model (AP = {avg_precision:.4f})')
     
@@ -283,44 +319,43 @@ def plot_metrics_summary(results, output_dir):
     return output_path
 
 
-def plot_benchmark_comparison(output_dir):
-    """Plot benchmark comparison across all datasets"""
+def plot_benchmark_comparison(output_dir, results_dir):
+    """Honest per-benchmark AUC (non-overlapping proteins), read from JSON."""
+    honest = load_json(Path(results_dir) / 'honest_benchmark_results.json')
+    if not honest:
+        print("⚠ honest_benchmark_results.json not found; skipping benchmark_comparison.png")
+        return None
+
+    order = ['scPDB', 'PDBbind', 'SC6K', 'COACH420', 'CryptoBench', 'DUD-E', 'BioLiP']
+    names, aucs, f1s = [], [], []
+    for b in order:
+        if b in honest and honest[b] and 'auc' in honest[b]:
+            names.append(b)
+            aucs.append(honest[b]['auc'])
+            f1s.append(honest[b].get('f1', 0.0))
+
     fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Benchmark data
-    benchmarks = ['Binding MOAD', 'Combined Test', 'scPDB', 'SC6K', 'PDBbind', 
-                  'BioLiP Sample', 'DUD-E Diverse', 'CryptoBench', 'COACH420']
-    aucs = [0.980, 0.949, 0.941, 0.921, 0.905, 0.883, 0.865, 0.855, 0.852]
-    top1s = [100.0, 68.8, 68.7, 63.5, 54.2, 48.2, 56.0, 50.0, 44.6]
-    
-    x = np.arange(len(benchmarks))
+    x = np.arange(len(names))
     width = 0.35
-    
-    # Plot bars
     bars1 = ax.bar(x - width/2, aucs, width, label='AUC', color='#2E86AB', edgecolor='black', linewidth=0.5)
-    bars2 = ax.bar(x + width/2, [t/100 for t in top1s], width, label='Top-1 Success Rate', 
-                   color='#28A745', edgecolor='black', linewidth=0.5)
-    
-    # Add value labels
+    bars2 = ax.bar(x + width/2, f1s, width, label='F1', color='#28A745', edgecolor='black', linewidth=0.5)
+
     for bar, val in zip(bars1, aucs):
         ax.annotate(f'{val:.3f}', xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
                    xytext=(0, 3), textcoords='offset points', ha='center', va='bottom', fontsize=9)
-    
-    for bar, val in zip(bars2, top1s):
-        ax.annotate(f'{val:.1f}%', xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
+    for bar, val in zip(bars2, f1s):
+        ax.annotate(f'{val:.3f}', xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
                    xytext=(0, 3), textcoords='offset points', ha='center', va='bottom', fontsize=9)
-    
-    # Reference line
+
     ax.axhline(y=0.9, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='AUC = 0.9')
-    
     ax.set_ylabel('Score')
-    ax.set_title('Performance Across All Benchmarks')
+    ax.set_title('Honest Performance Across Benchmarks (Non-Overlapping Proteins)')
     ax.set_xticks(x)
-    ax.set_xticklabels(benchmarks, rotation=45, ha='right')
-    ax.set_ylim([0, 1.15])
-    ax.legend(loc='upper right')
+    ax.set_xticklabels(names, rotation=45, ha='right')
+    ax.set_ylim([0, 1.18])
+    ax.legend(loc='upper right', ncol=2, framealpha=0.9)
     ax.grid(True, alpha=0.3, axis='y')
-    
+
     output_path = Path(output_dir) / 'benchmark_comparison.png'
     plt.tight_layout()
     plt.savefig(output_path)
@@ -333,11 +368,11 @@ def plot_sota_comparison(output_dir):
     """Plot SOTA method comparison"""
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Data
+    # Data (AUC on scPDB; ours = honest non-overlapping proteins)
     methods = ['GeometricGNN (Ours)', 'GPSite (2024)', 'PGpocket (2024)', 
                'GraphBind (2023)', 'DeepSurf (2021)', 'Kalasanty (2020)', 
                'PUResNet (2021)', 'P2Rank (2018)']
-    aucs = [0.949, 0.91, 0.90, 0.89, 0.88, 0.86, 0.85, 0.82]
+    aucs = [0.929, 0.91, 0.90, 0.89, 0.88, 0.86, 0.85, 0.82]
     colors = ['#E94F37'] + ['#2E86AB'] * 7  # Highlight our method
     
     y_pos = np.arange(len(methods))
@@ -357,13 +392,13 @@ def plot_sota_comparison(output_dir):
     ax.set_yticks(y_pos)
     ax.set_yticklabels(methods)
     ax.set_xlabel('AUC-ROC Score')
-    ax.set_title('Comparison with State-of-the-Art Methods')
+    ax.set_title('Comparison with State-of-the-Art (scPDB AUC, ours = honest non-overlap)')
     ax.set_xlim([0.75, 1.0])
     ax.grid(True, alpha=0.3, axis='x')
     
     # Add improvement annotation
     improvement = (aucs[0] - aucs[1]) * 100
-    ax.annotate(f'+{improvement:.1f}% vs SOTA', xy=(aucs[0], 7), xytext=(0.96, 6.5),
+    ax.annotate('scPDB (honest)', xy=(aucs[0], 7), xytext=(0.96, 6.5),
                fontsize=12, fontweight='bold', color='#E94F37',
                arrowprops=dict(arrowstyle='->', color='#E94F37'))
     
@@ -375,16 +410,31 @@ def plot_sota_comparison(output_dir):
     return output_path
 
 
-def plot_pocket_success_rates(output_dir):
-    """Plot pocket-level success rates comparison"""
+def plot_pocket_success_rates(output_dir, results_dir):
+    """Pocket-level Top-k success per challenging benchmark, read from JSON."""
+    ch = load_json(Path(results_dir) / 'challenging_benchmark_results.json')
+    pk = load_json(Path(results_dir) / 'pocket_level_results.json')
+    if not ch:
+        print("⚠ challenging_benchmark_results.json not found; skipping pocket_success_rates.png")
+        return None
+
+    datasets, top1, top3, top5 = [], [], [], []
+    # Combined Test first (from pocket_level_results summary), if present
+    if pk and 'summary' in pk and 'top_k_success' in pk['summary']:
+        tk = pk['summary']['top_k_success']
+        datasets.append('Combined Test')
+        top1.append(tk['top-1']['rate'] * 100)
+        top3.append(tk['top-3']['rate'] * 100)
+        top5.append(tk['top-5']['rate'] * 100)
+    for name, d in ch['benchmarks'].items():
+        p = d.get('pocket', {})
+        if 'top1' in p:
+            datasets.append(name)
+            top1.append(p['top1'] * 100)
+            top3.append(p['top3'] * 100)
+            top5.append(p['top5'] * 100)
+
     fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Data
-    datasets = ['Combined Test', 'scPDB', 'Binding MOAD', 'SC6K', 'COACH420']
-    top1 = [68.8, 68.7, 100.0, 63.5, 44.6]
-    top3 = [81.9, 79.3, 100.0, 75.3, 58.4]
-    top5 = [87.9, 82.7, 100.0, 83.5, 65.6]
-    
     x = np.arange(len(datasets))
     width = 0.25
     
@@ -396,8 +446,8 @@ def plot_pocket_success_rates(output_dir):
     ax.set_title('Pocket-Level Success Rate (Top-k Overlap)')
     ax.set_xticks(x)
     ax.set_xticklabels(datasets)
-    ax.set_ylim([0, 110])
-    ax.legend(loc='upper right')
+    ax.set_ylim([0, 125])
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.0), ncol=3, framealpha=0.9)
     ax.grid(True, alpha=0.3, axis='y')
     
     # Add value labels
@@ -421,7 +471,7 @@ def plot_model_efficiency(output_dir):
     
     # Data: (method, params in millions, AUC)
     methods = [
-        ('GeometricGNN (Ours)', 0.276, 0.949),
+        ('GeometricGNN (Ours)', 0.283, 0.929),
         ('GPSite', 10.0, 0.91),
         ('PGpocket', 5.0, 0.90),
         ('GraphBind', 2.0, 0.89),
@@ -456,7 +506,7 @@ def plot_model_efficiency(output_dir):
     ax.grid(True, alpha=0.3)
     
     # Add efficiency annotation
-    ax.annotate('36x smaller\nBetter AUC', xy=(0.276, 0.949), xytext=(0.8, 0.93),
+    ax.annotate('36x fewer params', xy=(0.283, 0.929), xytext=(0.8, 0.93),
                fontsize=10, fontweight='bold', color='#E94F37',
                arrowprops=dict(arrowstyle='->', color='#E94F37', lw=2))
     
@@ -476,6 +526,8 @@ def main():
                        help='Directory containing training_history.json')
     parser.add_argument('--output_dir', type=str, default=None,
                        help='Output directory for figures (default: results_dir/figures)')
+    parser.add_argument('--config', type=str, default='config_optimized.yaml',
+                       help='Config used to load the model for real ROC/PR curves')
     
     args = parser.parse_args()
     
@@ -487,8 +539,10 @@ def main():
     output_dir = args.output_dir or Path(args.results_dir) / 'figures'
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
-    # Load results
-    results = load_test_results(args.results_dir)
+    # Prefer REAL metrics computed live from the checkpoint (real ROC/PR curves)
+    results = compute_real_metrics(args.config)
+    if results is None:
+        results = load_test_results(args.results_dir)
     if results is None:
         print(f"Error: Could not load results from {args.results_dir}")
         return
@@ -512,10 +566,10 @@ def main():
     plot_training_history(history, output_dir)
     plot_metrics_summary(results, output_dir)
     
-    # NEW: Additional benchmark charts
-    plot_benchmark_comparison(output_dir)
+    # Benchmark charts (read from real JSON result files)
+    plot_benchmark_comparison(output_dir, args.results_dir)
     plot_sota_comparison(output_dir)
-    plot_pocket_success_rates(output_dir)
+    plot_pocket_success_rates(output_dir, args.results_dir)
     plot_model_efficiency(output_dir)
     
     print("\n" + "="*60)
@@ -529,4 +583,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -1,0 +1,18 @@
+{
+  "checkpoint": "B5_localframe",
+  "n": 246,
+  "auprc": 0.49629378526296786,
+  "auroc": 0.8760203329447815,
+  "clustering": {
+    "cut": 0.7,
+    "link_angstrom": 8,
+    "minimum_residues": 3
+  },
+  "top1_top3_top5": [
+    0.1991869918699187,
+    0.21951219512195122,
+    0.21951219512195122
+  ],
+  "median_first_centre_distance_conditional_on_prediction": 8.136933334646168,
+  "proteins_with_no_predicted_pocket": 0
+}

@@ -1,0 +1,77 @@
+{
+  "strict_label_mismatches": [],
+  "strict_test_graphs": 244,
+  "edge_graph_exact_matches": {
+    "6": 244,
+    "8": 11
+  },
+  "secondary_structure_all_zero_residues": 146312,
+  "residues": 146312,
+  "ligand_groups_244": {
+    "permissive": 1198,
+    "artifact": 293,
+    "modres": 105
+  },
+  "enrichment_counts": [
+    [
+      11361,
+      7394,
+      6515,
+      8659,
+      2102,
+      5879,
+      9033,
+      10751,
+      3980,
+      8304,
+      12539,
+      8185,
+      3187,
+      6149,
+      7428,
+      8423,
+      7754,
+      2763,
+      5877,
+      10029
+    ],
+    [
+      794,
+      499,
+      357,
+      334,
+      248,
+      260,
+      358,
+      1034,
+      267,
+      408,
+      427,
+      140,
+      206,
+      491,
+      320,
+      738,
+      546,
+      380,
+      392,
+      669
+    ]
+  ],
+  "baselines": {
+    "fpocket": {
+      "auprc": 0.17394495819312392,
+      "auroc": 0.6776928143462885
+    },
+    "p2rank": {
+      "auprc": 0.4702736438639035,
+      "auroc": 0.8799729081772947
+    }
+  },
+  "cluster_manifest_overlap": {
+    "B5_train__val": [],
+    "B5_train__T_clean": [],
+    "val__T_clean": []
+  },
+  "unmapped_cluster_ids": []
+}
