@@ -111,3 +111,7 @@ runs_*/
 
 # Markdown files unsed
 logs.md 
+
+# v1 manuscript — never publish
+legacy_v1/paper_v1/
+paper_v1/

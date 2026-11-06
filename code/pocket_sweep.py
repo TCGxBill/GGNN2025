@@ -14,14 +14,16 @@ Selection is on validation Top-1 DCA <= 4 A, the quantity the field reports. T_c
 at the end, with the selected setting.
 """
 import collections, itertools, json, os, sys
+import os
 from pathlib import Path
 
 import numpy as np
 import torch
 import yaml
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 sys.path.insert(0, str(OUT / "code"))
 from pocket_eval import true_sites, pdb_path, success, p2rank_pockets

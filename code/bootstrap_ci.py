@@ -11,6 +11,7 @@ Paired differences (GGNN - P2Rank) are computed within each bootstrap replicate,
 on the difference accounts for the two methods seeing the same structures.
 """
 import json, sys
+import os
 from pathlib import Path
 
 import numpy as np
@@ -18,8 +19,9 @@ import torch
 import yaml
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 torch.set_num_threads(2)
 TAG, GDIR, NBOOT = "B5_localframe", "data_localframe/combined", 2000

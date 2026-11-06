@@ -11,13 +11,15 @@ Ground truth comes from the relabelled graphs (all candidate ligands, 6 A), iden
 is scored against. Residues are matched to the graph by Ca coordinate.
 """
 import json, os, re, shutil, subprocess, sys, tempfile
+import os
 from pathlib import Path
 
 import numpy as np
 import torch
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 
 
 def pdb_path(code):

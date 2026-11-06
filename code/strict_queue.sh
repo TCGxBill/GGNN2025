@@ -5,8 +5,8 @@
 # was TRAINED on labels containing glycerol, acetate and selenomethionine sites, so it does not
 # measure the architecture. Stream B repeats the local-vs-global frame comparison under the new
 # labels, to check that the paper's main technical claim survives the label correction.
-cd /Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run
-P=/Users/trongnhannguyenvu/.claude-science/conda/envs/ggnn/bin/python
+cd "$(cd "$(dirname "$0")/.." && pwd)"   # repository root
+P=${GGNN_PYTHON:-python3}
 export OMP_NUM_THREADS=5 MKL_NUM_THREADS=5 GGNN_THREADS=5 PYTHONWARNINGS=ignore
 
 run () {  # tag split graphdir seed

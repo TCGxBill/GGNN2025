@@ -21,11 +21,13 @@ Labels are recomputed here without retraining; all three methods are rescored on
 """
 import collections, json, sys
 import numpy as np, torch, yaml
+import os
 from pathlib import Path
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC)); sys.path.insert(0, str(OUT / "code"))
 from pocket_eval import pdb_path, EXCLUDE
 torch.set_num_threads(6)

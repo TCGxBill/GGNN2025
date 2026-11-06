@@ -11,11 +11,13 @@ Graphs left with no positive residue are still written; the training driver skip
 graphs via the split files produced here.
 """
 import collections, json, os, shutil, sys
+import os
 from pathlib import Path
 import numpy as np, torch
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC)); sys.path.insert(0, str(OUT / "code"))
 from pocket_eval import EXCLUDE
 from strict_labels import MODRES, ARTIFACT, CUTOFF

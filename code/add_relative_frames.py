@@ -5,19 +5,21 @@ frames: R_rel = F_i^T F_j, flattened (9 values).
 
 localize_frames.py made the direction vector invariant by expressing it in the source residue's
 frame. That tells the network where j sits relative to i, but not how j is *oriented* relative to
-i — the information GVP and IPA carry as a relative rotation. R_rel is invariant to rigid motion
+i, the information GVP and IPA carry as a relative rotation. R_rel is invariant to rigid motion
 for the same reason the rotated direction is.
 
 edge_attr: 20 -> 29  = [distance(1), distance bins(16), direction in frame_i(3), R_rel(9)]
 Parameter cost: GATv2Conv's edge projection grows by 9 x sum(heads*out_dim) = 9 x 448 = 4,032,
-so the model goes from 282,017 to roughly 286,049 — still well inside the 300K budget.
+so the model goes from 282,017 to roughly 286,049, still well inside the 300K budget.
 """
 import sys
+import os
 from pathlib import Path
 import numpy as np
 import torch
 
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 SRC_TREE = OUT / "data_localframe"
 DST_TREE = OUT / "data_relframe"
 sys.path.insert(0, str(OUT / "code"))

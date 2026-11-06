@@ -5,10 +5,12 @@ identity to the model's OWN training set. Uses the validation-locked threshold s
 the checkpoint. Read-only w.r.t. the original repository.
 """
 import argparse, json, subprocess, sys, tempfile
+import os
 from pathlib import Path
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 MMSEQS = SRC / "mmseqs/bin/mmseqs"
 sys.path.insert(0, str(SRC))
 

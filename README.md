@@ -2,343 +2,280 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18061054.svg)](https://doi.org/10.5281/zenodo.18061054)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-BioGenesis-brightgreen.svg)](https://biogenesis-gules.vercel.app)
 
-A lightweight Geometric Graph Neural Network for predicting protein-ligand binding sites at the residue level. Achieves **state-of-the-art performance** with only **276K parameters** - 36x smaller than pLM-based methods.
+A compact geometric graph neural network that scores residues for ligand binding
+from structure alone. It has 282,017 trainable parameters, 1.1 MB on disk, CPU-only,
+with no protein language model and no sequence alignment.
 
-> 🌐 **[Try the Live Demo → BioGenesis](https://biogenesis-gules.vercel.app)** — Upload a PDB file and visualize predicted binding sites in 3D.
+**This repository is the homology-controlled revision (v2).** An audit of the
+original pipeline found three defects: a random rather than sequence-clustered
+partition, a decision threshold selected by maximising F1 on the test set, and a
+label rule that kept only the largest heteroatom group per structure. All three
+are corrected here, and the model is re-evaluated under the corrected protocol.
+The original code and results are preserved unchanged under `legacy_v1/` so the
+audit itself remains checkable.
 
-## Key Results
-
-| Benchmark | Type | AUC | Top-1 | Status |
-|-----------|------|-----|-------|--------|
-| Combined Test | In-distribution | **0.949** | **68.8%** | SOTA |
-| scPDB | Druggable sites | **0.941** | **68.7%** | SOTA |
-| Binding MOAD | High-quality | **0.980** | **100%** | SOTA |
-| CryptoBench | Cryptic sites | **0.855** | 50.0% | Competitive |
-| DUD-E | Drug targets | **0.865** | 56.0% | Strong |
-| SC6K | Surface cavities | **0.921** | 63.5% | Strong |
-
-### Comparison with Published Methods
-
-| Method | Year | AUC | Top-1 | Params |
-|--------|------|-----|-------|--------|
-| **GGNN 2025 (Ours)** | **2025** | **0.949** | **68.8%** | **276K** |
-| GPSite | 2024 | 0.91 | - | 10M+ |
-| PGpocket | 2024 | 0.90 | 42.0% | ~5M |
-| GraphBind | 2023 | 0.89 | - | ~2M |
-| DeepSurf | 2021 | 0.88 | 58.0% | ~8M |
-| P2Rank | 2018 | 0.82 | 63.0% | N/A |
+> The v1 README and reproducibility guide advertised state-of-the-art accuracy
+> using numbers measured on a leaky split. **Those claims are withdrawn.** They
+> are superseded by the results below.
 
 ---
 
-## Installation
+## Results under the corrected protocol
+
+On 244 cluster-disjoint test proteins, with identical labels and identical
+metrics for all three methods:
+
+| Method | Parameters | AUPRC | AUROC |
+|---|---|---:|---:|
+| P2Rank 2.4.1 | random forest | 0.4703 | 0.8800 |
+| GGNN 2025 | 282,017 | 0.4611 | 0.8647 |
+| Fpocket | 0 | 0.1739 | 0.6777 |
+
+GGNN 2025 is **behind** P2Rank, and the paired bootstrap interval contains zero,
+so the two are statistically indistinguishable on this test set. No superiority
+claim is made.
+
+One model, one validation-selected threshold (τ = 0.9088), one evaluation code
+path, three splits:
+
+| Split | AUPRC | AUROC | F1 | MCC |
+|---|---:|---:|---:|---:|
+| Validation (302) | 0.6696 | 0.9306 | 0.6205 | 0.5985 |
+| Test, homologous (316) | 0.8207 | 0.9776 | 0.7582 | 0.7437 |
+| Test, cluster-disjoint (244) | 0.4611 | 0.8647 | 0.4458 | 0.4291 |
+| **Change, homologous → disjoint** | **−43.8%** | **−11.5%** | −41.2% | −42.3% |
+
+AUROC loses 11.5% of its value under homology control while AUPRC loses 43.8%,
+a factor of 3.8. This is why AUPRC is the primary metric here.
+
+**Edge-feature frame.** Expressing edge directions in a per-residue local
+backbone frame instead of the global PDB coordinate frame is worth **+11.6%
+AUPRC (p = 0.020, three paired seeds)** at zero parameter cost. For scale,
+growing the training pool by 130% is worth +4.9%.
+
+**Residue ranking is not pocket localisation.** Under permissive labels GGNN has
+the best residue AUPRC of the three methods and the worst pocket Top-1 (19.9%
+against 56.9% for Fpocket and 58.1% for P2Rank). GGNN 2025 is a residue-level
+scorer; for a docking box, use a geometric method.
+
+---
+
+## Verify every reported number
+
+Needs nothing but a clone and the Python standard library. No PyTorch, no
+weights, no graph data, no network:
 
 ```bash
-# Clone repository
 git clone https://github.com/TCGxBill/GGNN2025.git
 cd GGNN2025
+python code/check_reported_numbers.py
+```
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
+```
+67/67 reported values match the saved result files.
+```
 
-# Install dependencies
+The script re-derives every table row and every percentage change in the
+manuscript directly from `results/`, and exits non-zero on any disagreement.
+
+---
+
+## Reproduction, in three levels
+
+Level 1 works from a bare clone. Levels 2 and 3 need data that is too large to
+distribute through Git.
+
+### Level 1: verify the reported numbers
+
+`python code/check_reported_numbers.py`, as above. This establishes that the
+manuscript reports what the run artifacts contain. It does not re-execute the
+model.
+
+### Level 2: recompute metrics from the checkpoint
+
+**Requires** the processed graph tensors (`data_strict/combined/`, roughly 6 GB,
+not distributed here), PyTorch and scikit-learn.
+
+```bash
+python verification/verify.py
+```
+
+An independent CPU forward pass of `checkpoints/B5_strict_lf.pth` over all three
+splits, rederiving the validation-selected threshold and writing
+`verification/verification.json`. The model class is vendored under
+`verification/copied_code/` so this path does not depend on the rest of `src/`.
+
+| Script | What it establishes |
+|---|---|
+| `verification/check_data.py` | labels recomputed from raw HETATM coordinates agree on all 244 clean-test proteins |
+| `verification/check_configuration.py` | graph dimensions, the constant DSSP fallback slots, frame determinant −1 |
+| `verification/verify_seeds.py` | six frame-comparison checkpoints reproduce their clean-test metrics |
+| `verification/check_original_figure.py` | the permissive-label checkpoint reproduces AUPRC 0.4963 and 49/246 pocket Top-1 |
+
+Their output records are committed, so the results can be inspected without
+running them.
+
+### Level 3: rebuild from structures
+
+**Requires** the raw PDB structures and external benchmark archives, neither
+distributed here. Several hours on CPU per training run.
+
+```bash
+# 1. Cluster sequences; whole clusters go to a single split
+mmseqs easy-cluster <fasta> <prefix> <tmp> --min-seq-id 0.3 -c 0.5 --cov-mode 0
+#    The resulting manifests are committed in splits/
+
+# 2. Strict ligand labels (excludes additives, ions, modified residues)
+python code/relabel_strict.py
+
+# 3. Rewrite edge directions into the per-residue local backbone frame
+python code/localize_frames.py
+
+# 4. Train
+python code/run_clean.py --tag B5_strict_lf --train-split B5_train \
+    --loss combined_ft --seed 42 --epochs 200 --patience 25
+
+# 5. Baselines on the identical split and labels
+python code/run_fpocket.py
+python code/baselines_on_split.py
+python code/verify_strict_comparison.py
+
+# 6. External benchmarks, pocket localisation, figures
+python code/eval_benchmarks.py
+python code/pocket_eval.py
+python code/make_figures.py        # writes figures/
+```
+
+### Paths and environment variables
+
+No script contains an absolute path. Each resolves the repository root from its
+own location, and both roots can be redirected:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `GGNN_SRC` | repository root | where raw structures and processed graphs are read from |
+| `GGNN_OUT` | repository root | where results, splits and checkpoints are written |
+| `GGNN_PYTHON` | `python3` | interpreter used by the batch shell scripts |
+| `GGNN_THREADS` | all cores | CPU threads for training and inference |
+| `FPOCKET_BIN` | `fpocket` | path to the Fpocket executable |
+
+If your data tree is separate from the repository, point `GGNN_SRC` and
+`GGNN_OUT` at it:
+
+```bash
+export GGNN_SRC=/path/to/data-tree GGNN_OUT=/path/to/run-tree
+```
+
+---
+
+## Protocol
+
+Sequences are clustered with MMseqs2 `easy-cluster` at 30% identity with coverage
+0.5, and whole clusters are assigned to a single split, so no test or validation
+protein shares a cluster with any training protein. A residue is positive when
+its stored coordinate lies within 6 Å of an atom of a retained candidate ligand;
+water, monatomic ions, crystallisation additives and modified amino acids are
+excluded. Checkpoint selection and the operating threshold are both determined on
+validation, by AUPRC and by F1 respectively, and the threshold is then held
+fixed for every test evaluation.
+
+Splits: 3,412 training, 302 validation, 244 cluster-disjoint test, 316 homologous
+test proteins. Seed 42. Locked threshold 0.9087636471.
+
+**Architecture.** Three GATv2 blocks of width 256 → 128 → 64, four attention
+heads, edge-conditioned attention over 20-dimensional edge features, residual
+connections, batch normalisation with ELU, dropout 0.15. Mean- and max-pooled
+global context projected to 32 dimensions and broadcast back to every node. Node
+features are 32-dimensional; note that in the committed runs DSSP was unavailable
+for every graph, so three secondary-structure slots are zero and the relative
+accessibility slot is 0.5 throughout. Objective: 0.3 weighted BCE + 0.7 focal
+Tversky (α = 0.3, β = 0.7, γ = 1.33, positive weight 12).
+
+---
+
+## Repository layout
+
+```
+paper/          manuscript (not published here; see Zenodo)
+results/        all run outputs as JSON and CSV
+verification/   independent checks and their recorded outputs
+splits/         cluster-assignment manifests
+code/           training, evaluation, baseline and figure scripts
+figures/        the four manuscript figures (PDF + 400 dpi PNG)
+checkpoints/    B5_strict_lf.pth, the strict-label model (1.1 MB)
+src/            model, data and training modules
+legacy_v1/      all superseded v1 material, preserved unchanged
+```
+
+## What is not in this repository
+
+- **Processed graph tensors and raw structures.** Too large for Git; levels 2 and
+  3 cannot run from a clone alone.
+- **The manuscript PDF and LaTeX source.** Held back deliberately; `paper/` is
+  listed in `.gitignore`. The study record is the Zenodo deposit below.
+- **Score dumps** (`*.npz`) behind the baseline comparison, omitted for size. The
+  metrics they produce are in `results/`.
+
+## Known gaps
+
+1. The original evaluation-audit figure has no generating script;
+   `code/make_figures.py` regenerates the other four from the result files.
+2. No matched end-to-end timing comparison exists. The model runs on CPU, but
+   per-protein latency and peak memory were never measured under controlled
+   conditions across methods, so no speedup is claimed anywhere.
+3. The strict-label headline run is a single seed. The frame comparison is
+   replicated across three.
+4. Baseline metrics were recalculated from stored residue scores, not from a
+   fresh execution of the Fpocket or P2Rank binaries.
+5. The split-manifest check confirms no shared cluster identifiers; it does not
+   rerun MMseqs2.
+
+---
+
+## Software
+
+```
+Python >= 3.10
+torch==2.4.0            scipy==1.15.3        biopython==1.86
+torch-geometric==2.5.3  scikit-learn==1.6.1  pyyaml==6.0.2
+numpy==2.2.5            pandas==2.2.3        matplotlib==3.10.3
+```
+
+Level 1 needs none of these, only the standard library.
+
+```bash
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Requirements
-- Python 3.8+
-- PyTorch 2.0+
-- PyTorch Geometric 2.3+
-- BioPython 1.81+
-- NumPy, SciPy, Pandas
-- scikit-learn 1.3+
-
----
-
-## Quick Start (Using Pre-trained Model)
-
-**This repository includes a pre-trained model ready to use!**
-
-### Option 1: Predict on Your Own PDB File
-
-```python
-import torch
-import yaml
-import sys
-sys.path.insert(0, 'src')
-
-from models.gcn_geometric import GeometricGNN
-from data.preprocessor import ProteinPreprocessor
-from data.graph_builder import ProteinGraphBuilder
-
-# Load config and model
-with open('config_optimized.yaml', 'r') as f:
-    config = yaml.safe_load(f)
-
-model = GeometricGNN(config['model'])
-checkpoint = torch.load('checkpoints_optimized/best_model.pth', 
-                        map_location='cpu', weights_only=False)
-model.load_state_dict(checkpoint['model_state_dict'])
-model.eval()
-
-# Process your protein
-preprocessor = ProteinPreprocessor(config['preprocessing'])
-graph_builder = ProteinGraphBuilder(config['preprocessing'])
-
-# Load and predict
-data = preprocessor.process_pdb('path/to/your_protein.pdb')
-graph = graph_builder.build_graph(
-    data['node_features'], 
-    data['coordinates'], 
-    data['labels'] if 'labels' in data else None
-)
-
-with torch.no_grad():
-    predictions = torch.sigmoid(model(graph))
-    binding_probs = predictions.squeeze().numpy()
-
-# Get binding residues (threshold = 0.85)
-binding_residues = [i for i, p in enumerate(binding_probs) if p > 0.85]
-print(f"Predicted {len(binding_residues)} binding residues")
-print(f"Residue indices: {binding_residues}")
-```
-
-### Option 2: Run Benchmark Evaluation
-
-```bash
-# Evaluate on all benchmarks (uses pre-processed data in data/processed/)
-python experiments/comprehensive_eval.py
-
-# Results saved to results_optimized/comprehensive_benchmark_results.json
-```
-
-### Option 3: Evaluate on Non-overlapping Proteins Only
-
-```bash
-# For honest evaluation without training data overlap
-python experiments/honest_eval.py
-
-# Results saved to results_optimized/honest_benchmark_results.json
-```
-
-### Pre-trained Model Details
-
-| Property | Value |
-|----------|-------|
-| **Model file** | `checkpoints_optimized/best_model.pth` |
-| **Parameters** | 276,097 (1.1 MB) |
-| **Architecture** | GATv2 with geometric edge encoding |
-| **Input** | PDB file (any protein structure) |
-| **Output** | Per-residue binding probability [0, 1] |
-| **Threshold** | 0.85 (optimized for class imbalance) |
-| **Inference time** | ~6ms per protein on CPU |
-
-### Available Benchmark Data
-
-Pre-processed benchmark data in `data/processed/`:
-- `combined/test/` - 432 proteins (Combined Test Set)
-- `scpdb/` - 150 druggable binding sites
-- `coach420/` - 420 diverse proteins
-- `pdbbind/` - 154 protein-ligand complexes
-- `biolip/` - 168 biologically relevant sites
-- `cryptobench/` - 22 cryptic binding sites
-
----
-
-## Reproducing Results
-
-### Step 1: Download Data
-
-Download the Holo4K dataset (or use your own PDB files):
-
-```bash
-# Create data directories
-mkdir -p data/raw/holo4k
-
-# Place PDB files in data/raw/holo4k/
-# Each PDB should have binding site annotations
-```
-
-### Step 2: Preprocess Data
-
-```bash
-# Preprocess combined dataset with train/val/test split
-python scripts/preprocess_all.py \
-    --dataset combined \
-    --input data/raw \
-    --output data/processed/combined \
-    --split \
-    --train_ratio 0.8 \
-    --val_ratio 0.1
-
-# Output structure:
-# data/processed/combined/
-#   ├── train/         (3449 proteins)
-#   ├── val/           (431 proteins)
-#   ├── test/          (432 proteins)
-#   └── metadata.json
-```
-
-### Step 3: Train Model
-
-```bash
-# Train with optimized configuration
-python scripts/train.py --config config_optimized.yaml
-
-# Training parameters:
-# - Batch size: 32
-# - Learning rate: 0.0008
-# - Loss: Combined (30% BCE + 70% Dice)
-# - Epochs: 40 (early stopping at ~32)
-# - Device: CPU or MPS (Apple Silicon)
-```
-
-Training takes approximately 4 hours on Apple M2.
-
-### Step 4: Evaluate Model
-
-```bash
-# Run comprehensive evaluation
-python experiments/comprehensive_eval.py
-
-# Results saved to results_optimized/
-```
-
----
-
-## Quick Inference
-
-```python
-import torch
-from src.models.gcn_geometric import GeometricGNN
-from src.data.preprocessor import ProteinPreprocessor
-from src.data.graph_builder import ProteinGraphBuilder
-
-# Load pre-trained model
-model = GeometricGNN.from_config("config_optimized.yaml")
-checkpoint = torch.load("checkpoints_optimized/best_model.pth", 
-                        map_location="cpu", weights_only=False)
-model.load_state_dict(checkpoint['model_state_dict'])
-model.eval()
-
-# Process a protein
-preprocessor = ProteinPreprocessor({'distance_threshold': 8.0, 'k_neighbors': 15})
-graph_builder = ProteinGraphBuilder({'distance_threshold': 8.0, 'k_neighbors': 15})
-
-data = preprocessor.process_pdb("your_protein.pdb")
-graph = graph_builder.build_graph(
-    data['node_features'], 
-    data['coordinates'], 
-    data['labels']
-)
-
-# Predict binding sites
-with torch.no_grad():
-    predictions = torch.sigmoid(model(graph))
-    binding_residues = (predictions > 0.85).squeeze().numpy()
-
-print(f"Predicted binding residues: {binding_residues.sum()}")
-```
-
----
-
-## Project Structure
-
-```
-GGNN2025/
-├── src/
-│   ├── models/gcn_geometric.py       # GATv2 model architecture
-│   ├── data/
-│   │   ├── preprocessor.py           # PDB parsing, feature extraction
-│   │   └── graph_builder.py          # Graph construction
-│   ├── training/trainer.py           # Training loop, Combined Loss
-│   └── evaluation/metrics.py         # AUC, MCC, F1 metrics
-├── scripts/
-│   ├── train.py                      # Main training script
-│   ├── preprocess_all.py             # Data preprocessing
-│   ├── visualize_results.py          # Generate figures
-│   ├── ablation_study.py             # Loss/architecture ablation
-│   └── download_benchmark_datasets.py
-├── experiments/
-│   ├── comprehensive_eval.py         # Multi-benchmark evaluation
-│   ├── cross_dataset_eval.py         # Cross-dataset testing
-│   ├── pocket_level_eval.py          # Pocket success rates
-│   ├── honest_eval.py                # Non-overlapping evaluation
-│   └── honest_pocket_eval.py         # Honest pocket-level metrics
-├── analysis/
-│   ├── verify_dataset.py             # Data leakage check
-│   ├── check_benchmark_overlap.py    # Train-test overlap analysis
-│   ├── amino_acid_enrichment.py      # AA composition analysis
-│   └── case_study_validation.py      # Biological validation
-├── checkpoints_optimized/
-│   └── best_model.pth                # Pre-trained weights (3.4MB)
-├── results_optimized/
-│   ├── figures/                      # Publication figures (9 PNG)
-│   └── *.json                        # Evaluation results
-├── paper/
-│   ├── GGNN2025.tex                  # Paper manuscript (12 pages)
-│   └── GGNN2025.pdf                  # Compiled PDF
-├── config_optimized.yaml             # Training configuration
-├── requirements.txt                  # Dependencies
-├── LICENSE                           # MIT License
-└── README.md
-```
-
----
-
-## Model Architecture
-
-**GGNN 2025** uses GATv2 (Graph Attention Network v2) with:
-
-| Component | Configuration |
-|-----------|---------------|
-| Layers | 3 GATv2 layers |
-| Hidden dims | 256 → 128 → 64 |
-| Attention heads | 4 |
-| Edge features | 20-dim (distance + direction) |
-| Node features | 29-dim |
-| Dropout | 0.15 |
-| Parameters | 276,097 |
-
-### Combined Loss Function
-
-```python
-L = 0.3 * BCE_weighted + 0.7 * Dice
-# BCE pos_weight = 12.0 (for class imbalance 1:31)
-```
+External tools: MMseqs2 for clustering, Fpocket and P2Rank 2.4.1 for the
+baselines. DSSP is optional.
 
 ---
 
 ## Citation
 
 ```bibtex
-@article{nguyen2025ggnn,
-  title={GGNN 2025: A Lightweight Geometric Graph Neural Network 
-         for Protein-Ligand Binding Site Prediction},
-  author={Nguyen, Vu Trong Nhan},
-  journal={Zenodo},
-  year={2025}
+@misc{nguyen2026ggnn,
+  title  = {GGNN 2025: A Lightweight Geometric Graph Neural Network
+            for Protein--Ligand Binding Site Prediction},
+  author = {Nguyen, Nhan Vu Trong and Nguyen, Linh Hoang Anh},
+  year   = {2026},
+  doi    = {10.5281/zenodo.18061054},
+  note   = {Homology-controlled revision}
 }
 ```
 
----
-
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-- Holo4K dataset providers
-- PyTorch Geometric team
-- AI assistants: Claude (Anthropic), Grok (xAI), Antigravity (Google DeepMind)
-- Hardware: Apple MacBook Air M2
-
----
-
-*Last updated: March 21, 2026*
+Dataset providers for Holo4K, scPDB, PDBbind, SC6K, COACH420, Binding MOAD,
+DUD-E and CryptoBench; the PyTorch Geometric team; the authors of MMseqs2,
+Fpocket and P2Rank. AI assistants were used as development and analysis tools,
+including for the audit of the original pipeline; experimental design,
+measurements and conclusions are the authors' own.

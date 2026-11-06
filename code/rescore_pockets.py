@@ -27,20 +27,22 @@ isolates the contribution of the re-scoring), and the oracle ceiling (is the tru
 candidate set at all?).
 """
 import itertools, json, os, re, shutil, subprocess, sys
+import os
 from pathlib import Path
 
 import numpy as np
 import torch
 import yaml
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 sys.path.insert(0, str(OUT / "code"))
 from pocket_eval import true_sites, pdb_path
 
 torch.set_num_threads(3)
-FPOCKET = "/Users/trongnhannguyenvu/.claude-science/conda/envs/baselines/bin/fpocket"
+FPOCKET = os.environ.get("FPOCKET_BIN", "fpocket")
 WORK = Path("/tmp/fp_rescore")
 TAG, GDIR = "B5_localframe", "data_localframe/combined"
 

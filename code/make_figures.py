@@ -127,7 +127,7 @@ def fig_metric_inversion():
     for i, v in enumerate(pk): axb.text(i, v + 3.5, f"{v:.1f}%", ha="center", fontsize=7)
     axb.set_xticks(xx); axb.set_xticklabels(nm, fontsize=7); axb.set_ylim(0, 75)
     axb.set_ylabel("Pocket Top-1 success (DCA ≤ 4 Å)"); axb.set_title("Locating pockets", loc="left")
-    fig.suptitle("The ranking inverts between the two tasks — permissive labels, 246 proteins",
+    fig.suptitle("The ranking inverts between the two tasks: permissive labels, 246 proteins",
                  x=0.01, ha="left", fontsize=8.5)
     fig.tight_layout(rect=[0, 0, 1, 0.93]); save(fig, "fig_metric_inversion_v2")
 

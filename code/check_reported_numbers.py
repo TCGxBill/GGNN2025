@@ -136,7 +136,7 @@ for ok, label, reported, actual in checks:
         print(f"FAIL  {label:<{width}}  reported={reported!r}  file={actual!r}")
 print(f"\n{len(checks) - len(failed)}/{len(checks)} reported values match the saved result files.")
 if failed:
-    print(f"{len(failed)} MISMATCH(ES) — see above.")
+    print(f"{len(failed)} MISMATCH(ES). See above.")
     sys.exit(1)
 print("All headline numbers in the manuscript are reproduced from results/.")
 sys.exit(0)

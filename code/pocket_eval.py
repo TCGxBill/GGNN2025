@@ -16,13 +16,15 @@ Baselines are scored identically: P2Rank pocket centres come from its own *_pred
 Fpocket centres from the alpha-sphere barycentres in its pocket PDBs.
 """
 import argparse, collections, csv, json, os, sys
+import os
 from pathlib import Path
 
 import numpy as np
 import torch
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 EXCLUDE = {"HOH", "WAT", "TIP3", "SOL", "NA", "CL", "K", "MG", "CA", "ZN", "MN",
            "FE", "SO4", "PO4"}

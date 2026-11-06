@@ -18,11 +18,13 @@ Frame at residue i (ProteinMPNN / GVP convention, Ca-only variant):
 Chain termini and degenerate (collinear) triples reuse the nearest valid frame.
 """
 import sys
+import os
 from pathlib import Path
 import numpy as np
 import torch
 
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 SRC_TREE = OUT / "data_relabeled"
 DST_TREE = OUT / "data_localframe"
 EPS = 1e-8

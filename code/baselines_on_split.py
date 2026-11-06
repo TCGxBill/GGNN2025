@@ -20,6 +20,7 @@ between regimes, per method.
 Writes results/baselines_<split>.json and results/baselines_<split>.npz.
 """
 import argparse, csv, json, os, re, shutil, subprocess, sys, tempfile
+import os
 from pathlib import Path
 
 import numpy as np
@@ -27,8 +28,9 @@ import torch
 import yaml
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC)); sys.path.insert(0, str(OUT / "code"))
 from relabel_strict import find_pdb
 

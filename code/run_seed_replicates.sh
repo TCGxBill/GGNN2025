@@ -1,5 +1,5 @@
 #!/bin/bash
-# Overnight queue: seed replicates.
+# Seed replicates: two extra seeds per configuration.
 #
 # Every architecture conclusion so far rests on a single run per configuration, so differences of
 # 1-3% cannot be separated from seed noise. Two extra seeds per configuration give a mean and a
@@ -9,8 +9,8 @@
 #
 # Three streams x 4 torch threads = 12 of 15 cores, leaving headroom for the pocket sweep.
 
-cd /Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run
-PY=/Users/trongnhannguyenvu/.claude-science/conda/envs/ggnn/bin/python
+cd "$(cd "$(dirname "$0")/.." && pwd)"   # repository root
+PY=${GGNN_PYTHON:-python3}
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 GGNN_THREADS=4 PYTHONWARNINGS=ignore
 
 run () {  # tag split graphdir seed

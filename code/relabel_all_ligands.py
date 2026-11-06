@@ -11,12 +11,14 @@ own `pos` tensor, so no residue-ordering assumption is needed. Writes to a new t
 data/processed/combined is not modified.
 """
 import collections, glob, os, sys
+import os
 from pathlib import Path
 import numpy as np
 import torch
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run/data_relabeled")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(OUT) / "data_relabeled"
 EXCLUDE = {"HOH", "WAT", "TIP3", "SOL", "NA", "CL", "K", "MG", "CA", "ZN", "MN",
            "FE", "SO4", "PO4"}
 CUTOFF = 6.0          # same ligand-proximity rule the original code uses

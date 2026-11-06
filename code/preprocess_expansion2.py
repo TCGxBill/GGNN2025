@@ -13,13 +13,15 @@ Only structures whose cluster contains no benchmark, val, T_clean or T_leaky pro
 (filtering already done in splits/expansion2_paths.json).
 """
 import collections, json, sys
+import os
 from pathlib import Path
 
 import numpy as np
 import torch
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 sys.path.insert(0, str(OUT / "code"))
 

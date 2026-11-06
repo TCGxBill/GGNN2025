@@ -12,10 +12,12 @@ Protocol fixes relative to the original scripts/train.py:
   * no warm-starting from any existing checkpoint
 """
 import argparse, json, os, sys, time
+import os
 from pathlib import Path
 
-SRC = Path("/Users/trongnhannguyenvu/Downloads/files-2/binding-site-prediction")
-OUT = Path("/Users/trongnhannguyenvu/Downloads/files-2/ggnn-homology-run")
+ROOT = Path(__file__).resolve().parent.parent
+SRC = Path(os.environ.get("GGNN_SRC", ROOT))
+OUT = Path(os.environ.get("GGNN_OUT", ROOT))
 sys.path.insert(0, str(SRC))
 
 import numpy as np
